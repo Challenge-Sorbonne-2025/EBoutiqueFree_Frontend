@@ -1,0 +1,69 @@
+.header-accueil {
+    width: 100%;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+}
+
+.header-container {
+    max-width: 1350px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-container {
+    flex: 0 0 auto;
+}
+
+.logo {
+    height: 40px;
+    width: auto;
+}
+
+.account-link {
+    margin-left: auto;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.account-link .nav-link {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.account-link .nav-link:hover {
+    color: #238cf5;
+}
+
+.account-link .nav-link.account {
+    padding: 0.5rem 1rem;
+    border: 1px solid #f13c4b;
+    border-radius: 4px;
+    color: #fa0f0f;
+}
+
+.account-link .nav-link.account:hover {
+    background-color: #f8bbb7;
+    color: white;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .header-container {
+        padding: 0 1rem;
+    }
+
+    .account-link {
+        gap: 1rem;
+    }
+
+    .nav-link {
+        font-size: 0.9rem;
+    }
+} 
