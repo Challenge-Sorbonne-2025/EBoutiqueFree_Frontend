@@ -1,0 +1,386 @@
+/* Reset de base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* Style principal */
+.store-finder {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    position: relative;
+}
+
+/* Header styles */
+header#top {
+    width: 100%;
+    height: 60px;
+    padding: 0 2rem;
+    background-color: #fff;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+}
+
+#top-logo {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+#logo-free {
+    height: 30px;
+    width: auto;
+}
+
+/* Main content */
+.store-finder-main {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+}
+
+.store-finder-container {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: #000;
+    font-weight: 600;
+    text-align: center;
+}
+
+.store-finder-container > p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.search-form {
+    width: 100%;
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.search-fields {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    width: 100%;
+}
+
+.field {
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 1.2rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: #000;
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-input:hover {
+    background-color: #333;
+}
+
+.search-input::placeholder {
+    color: #fff;
+}
+
+/* Store Banner Section */
+.store-banner {
+    width: 100%;
+    max-width: 1000px;
+    margin: 2rem auto;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.store-image-container {
+    width: 100%;
+    height: 400px;
+   
+    position: relative;
+    background-color: #f5f5f5;
+}
+
+.store-banner-image {
+    width: 100%;
+    height: 100%; 
+    object-fit: cover;
+}
+
+.store-banner-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    color: white;
+}
+
+.store-banner-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: white;
+    text-align: left;
+}
+
+.store-banner-content p {
+    font-size: 1.2rem;
+    max-width: 600px;
+}
+
+/* Media Queries pour la bannière */
+@media (max-width: 768px) {
+    .store-banner {
+        margin: 1rem;
+    }
+
+    .store-image-container {
+        height: 220px;
+    }
+
+    .store-banner-content h2 {
+        font-size: 1.8rem;
+    }
+
+    .store-banner-content p {
+        font-size: 1rem;
+    }
+}
+
+.smartphones-section {
+    width: 100%;
+    margin-top: 4rem;
+    padding: 0 2rem;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 3rem;
+    color: #000;
+    font-weight: 500;
+    text-align: center;
+}
+
+input{
+    text-align: center;
+}
+
+.smartphones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.smartphone-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.smartphone-card:hover {
+    transform: translateY(-5px);
+}
+
+.image-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.smartphone-image {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.smartphone-card h3 {
+    margin: 1rem 0 0.5rem;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.smartphone-card p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.voir-plus {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.voir-plus a {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.voir-plus a:hover {
+    background-color: #0056b3;
+}
+
+.voir-produit {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.voir-produit a {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background-color: #bec5ce;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.voir-produit a:hover {
+    background-color: #b8c6d6;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .store-finder-main {
+        padding: 1rem;
+    }
+
+    .search-fields {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .field {
+        max-width: 100%;
+    }
+
+    .smartphones-grid {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+        padding: 0 1rem;
+    }
+
+    .store-finder-container > p {
+        padding: 0 1rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .smartphones-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.search-options {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin: 3rem 0;
+    padding: 0 1rem;
+}
+
+.search-option {
+    flex: 1;
+    max-width: 400px;
+    text-decoration: none;
+    color: inherit;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.search-option:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.option-content {
+    padding: 2rem;
+    text-align: center;
+}
+
+.option-content h3 {
+    color: #333;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.option-content p {
+    color: #666;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .search-options {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .search-option {
+        max-width: 100%;
+    }
+
+    .option-content {
+        padding: 1.5rem;
+    }
+} 

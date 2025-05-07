@@ -1,16 +1,18 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Container, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import ProductList from './components/ProductList';
-import Login from './components/Login';
+import { ThemeProvider, createTheme } from '@mui/material';
+import ProductList from './components/Produits/ProductList';
+import Login from './components/Accueils/Login';
+import StoreFinder from './components/Accueils/StoreFinder';
+import './App.css';
 
 const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#1976d2',
+      main: '#cd1517', // Rouge Free
     },
     secondary: {
-      main: '#dc004e',
+      main: '#000000',
     },
   },
 });
@@ -18,14 +20,12 @@ const theme = createTheme({
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
       <Router>
-        <Container maxWidth="lg">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<ProductList />} />
-          </Routes>
-        </Container>
+        <Routes>
+          <Route path="/" element={<StoreFinder />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/products" element={<ProductList />} />
+        </Routes>
       </Router>
     </ThemeProvider>
   );

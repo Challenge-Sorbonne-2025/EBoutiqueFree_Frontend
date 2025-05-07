@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography } from '@mui/material';
-import publicApi from '../services/publicApi';
+import publicApi from '../../services/publicApi';
 
 interface Product {
     id: number;
