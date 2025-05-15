@@ -1,6 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// src/App.tsx
+
+import { BrowserRouter as Router, useRoutes } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
-import ProductList from './components/Produits/ProductList';
+import produitRoutes from './routes/produitRoutes';
+import boutiqueRoutes from './routes/boutiqueRoutes'; // ✅ nouveau
 import Login from './components/Accueils/Login';
 import StoreFinder from './components/Accueils/StoreFinder';
 import './App.css';
@@ -9,7 +12,7 @@ const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#cd1517', // Rouge Free
+      main: '#cd1517',
     },
     secondary: {
       main: '#000000',
@@ -17,15 +20,32 @@ const theme = createTheme({
   },
 });
 
+const generalRoutes = [
+  {
+    path: '/',
+    element: <StoreFinder />
+  },
+  {
+    path: '/login',
+    element: <Login />
+  }
+];
+
+function AppRoutes() {
+  // Fusion des routes générales, produits et boutiques
+  const routes = useRoutes([
+    ...generalRoutes,
+    ...produitRoutes,
+    ...boutiqueRoutes // ✅ ajouté ici
+  ]);
+  return routes;
+}
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <Router>
-        <Routes>
-          <Route path="/" element={<StoreFinder />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/products" element={<ProductList />} />
-        </Routes>
+        <AppRoutes />
       </Router>
     </ThemeProvider>
   );
