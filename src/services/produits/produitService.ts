@@ -1,33 +1,63 @@
-// src/services/produits/produitService.ts
-
 import api from '../api';
-import { getToken } from '../auth';
 
-const authHeader = () => ({
-  headers: { Authorization: `Bearer ${getToken()}` },
-});
+export interface Marque {
+  marque_id: number;
+  marque: string;
+}
 
-export const getAllProduits = async () => {
-  const response = await api.get('/produits/', authHeader());
+export interface Modele {
+  modele_id: number;
+  modele: string;
+  marque: Marque;
+}
+
+export interface ProduitCreateDTO {
+  nom_produit: string;
+  modele_id: number;
+  prix: number;
+  couleur: string;
+  capacite: number;
+  ram: number;
+}
+
+export const getAllProduits = async (): Promise<{
+  produit_id: number;
+  nom_produit: string;
+  modele: Modele;
+  prix: number;
+  couleur: string;
+  capacite: number;
+  ram: number;
+  validation_responsable: boolean;
+}[]> => {
+  const response = await api.get('/produits/');
   return response.data;
 };
 
-export const getProduitById = async (id: string) => {
-  const response = await api.get(`/produits/${id}/`, authHeader());
+export const getProduit = async (id: string): Promise<{
+  produit_id: number;
+  nom_produit: string;
+  modele: Modele;
+  prix: number;
+  couleur: string;
+  capacite: number;
+  ram: number;
+  validation_responsable: boolean;
+}> => {
+  const response = await api.get(`/produits/${id}/`);
   return response.data;
 };
 
-export const createProduit = async (produitData: any) => {
-  const response = await api.post('/produits/', produitData, authHeader());
+export const createProduit = async (produitData: ProduitCreateDTO) => {
+  const response = await api.post('/produits/', produitData);
   return response.data;
 };
 
-export const updateProduit = async (id: string, produitData: any) => {
-  const response = await api.put(`/produits/${id}/`, produitData, authHeader());
+export const updateProduit = async (id: string, produitData: Partial<ProduitCreateDTO>) => {
+  const response = await api.put(`/produits/${id}/`, produitData);
   return response.data;
 };
 
-export const deleteProduit = async (id: string) => {
-  const response = await api.delete(`/produits/${id}/`, authHeader());
-  return response.data;
+export const deleteProduit = async (id: string): Promise<void> => {
+  await api.delete(`/produits/${id}/`);
 };

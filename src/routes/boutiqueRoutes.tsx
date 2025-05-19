@@ -1,12 +1,10 @@
-// src/routes/boutiqueRoutes.tsx
-
-import BoutiquesList from '../components/Boutiques/BoutiqueList';
+import BoutiqueList from '../components/Boutiques/BoutiqueList';
 import BoutiqueForm from '../components/Boutiques/BoutiqueForm';
 
 const boutiqueRoutes = [
   {
     path: '/boutiques',
-    element: <BoutiquesList />
+    element: <BoutiqueList />
   },
   {
     path: '/boutiques/new',

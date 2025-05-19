@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/auth';
+// import { checkUserBoutique } from '../../services/boutiques/boutiqueService';
 import Header from '../Headers/Header';
 import '../../assets/styles/Login.css';
 
@@ -12,16 +13,24 @@ export default function Login() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // Validation simple
+
         if (!username.trim() || !password.trim()) {
             setError('Veuillez remplir tous les champs.');
             return;
         }
-        
+
         try {
             await login({ username, password });
-            navigate('/products');
+             navigate('/boutiques'); 
+
+            // Vérifie si l'utilisateur a une boutique
+            // const result = await checkUserBoutique();
+
+            // if (result.hasBoutique) {
+            //     navigate('/boutiques');       // Il a une boutique -> liste
+            // } else {
+            //     navigate('/boutiques/new');   // Pas de boutique -> création
+            // }
         } catch (err) {
             setError('Erreur de connexion. Vérifiez vos identifiants.');
         }
@@ -78,7 +87,7 @@ export default function Login() {
                             </form>
 
                             <hr />
-                            
+
                             <div className="links">
                                 <a href="/password-recovery" title="Mot de passe oublié">
                                     <img src="/images/question.svg" alt="" />
@@ -86,7 +95,7 @@ export default function Login() {
                                 </a>
                                 <a href="/mobile" title="Espace Abonné Free Mobile">
                                     <img src="/images/smartphone.svg" alt="" />
-                                    Touver votre Telephone dans la boutique Free la plus proche.
+                                    Trouver votre Telephone dans la boutique Free la plus proche.
                                 </a>
                                 <a href="/offers" title="Découvrir nos offres">
                                     <img src="/images/freebox.svg" alt="" />

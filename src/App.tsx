@@ -1,9 +1,7 @@
-// src/App.tsx
-
 import { BrowserRouter as Router, useRoutes } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
 import produitRoutes from './routes/produitRoutes';
-import boutiqueRoutes from './routes/boutiqueRoutes'; // ✅ nouveau
+import boutiqueRoutes from './routes/boutiqueRoutes';
 import Login from './components/Accueils/Login';
 import StoreFinder from './components/Accueils/StoreFinder';
 import './App.css';
@@ -32,11 +30,10 @@ const generalRoutes = [
 ];
 
 function AppRoutes() {
-  // Fusion des routes générales, produits et boutiques
   const routes = useRoutes([
     ...generalRoutes,
     ...produitRoutes,
-    ...boutiqueRoutes // ✅ ajouté ici
+    ...boutiqueRoutes,
   ]);
   return routes;
 }

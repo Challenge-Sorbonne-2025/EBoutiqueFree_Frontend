@@ -1,85 +1,90 @@
-// components/boutiques/BoutiquesList.tsx
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Button
-} from '@mui/material';
-
+import { Box, Typography, List, ListItem, ListItemText, Button } from '@mui/material';
 import { getAllBoutiques } from '../../services/boutiques/boutiqueService';
 import BoutiqueDeleteButton from './BoutiqueDeleteButton';
+import type { Boutique } from './Boutique';
 
-// Typage basique pour une boutique. Tu peux améliorer en fonction du modèle réel.
-interface Boutique {
-  id: number; // id de type number venant du backend
-  nom: string;
-  adresse: string;
-  ville: string;
-  code_postal: string;
-}
-
-const BoutiquesList: React.FC = () => {
+const BoutiqueList = () => {
   const [boutiques, setBoutiques] = useState<Boutique[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [error, setError] = useState<string>('');
 
-  // Fonction pour charger les boutiques depuis le backend
   const fetchBoutiques = async () => {
     try {
       const data = await getAllBoutiques();
-      setBoutiques(data);
+      console.log(data)
+      if (Array.isArray(data)){
+        setBoutiques(data);
+      }
+      else if  (data.results && Array.isArray(data.results)) {
+                    // Si les données sont dans un champ 'results' (format courant de DRF)
+              setBoutiques(data.results);
+                }
+       else {
+              setError('Format de données incorrect');
+              console.error('Format de données reçu:', data);
+            }
+      
     } catch (error) {
-      console.error('Erreur lors de la récupération des boutiques:', error);
+      console.error('Erreur:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Appelé au premier rendu pour charger la liste
   useEffect(() => {
     fetchBoutiques();
   }, []);
 
-  return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        Liste des boutiques
-      </Typography>
+   if (error) {
+        return <Typography color="error">{error}</Typography>;
+    }
 
+    // Vérifier si products est bien un tableau avant d'utiliser map
+    if (!Array.isArray(boutiques)) {
+        return <Typography color="error">Erreur de format des données</Typography>;
+    }
+
+  if (loading) return <Typography>Chargement...</Typography>;
+
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" gutterBottom>Liste des boutiques</Typography>
+      
       <Button
         variant="contained"
-        color="primary"
         onClick={() => navigate('/boutiques/new')}
-        sx={{ mb: 2 }}
+        sx={{ mb: 3 }}
       >
-        Ajouter une boutique
+        Créer une boutique
       </Button>
 
       <List>
         {boutiques.map((boutique) => (
           <ListItem
-            key={boutique.id}
+            key={boutique.boutique_id}
+            divider
             secondaryAction={
-              <Box sx={{ display: 'flex', gap: 1 }}>
+              <>
                 <Button
                   variant="outlined"
-                  onClick={() => navigate(`/boutiques/edit/${boutique.id}`)}
+                  onClick={() => navigate(`/boutiques/edit/${boutique.boutique_id}`)}
+                  sx={{ mr: 1 }}
                 >
                   Modifier
                 </Button>
-                {/* Conversion de id en string ici */}
-                <BoutiqueDeleteButton
-                  id={boutique.id.toString()} // Conversion de id en string
-                  onDeleted={fetchBoutiques}
+                <BoutiqueDeleteButton 
+                  boutique_id={boutique.boutique_id} 
+                  onDeleted={fetchBoutiques} 
                 />
-              </Box>
+              </>
             }
           >
             <ListItemText
-              primary={boutique.nom}
-              secondary={`${boutique.ville}, ${boutique.adresse} (${boutique.code_postal})`}
+              primary={boutique.nom_boutique}
+              secondary={`${boutique.adresse}, ${boutique.ville} (${boutique.code_postal})`}
             />
           </ListItem>
         ))}
@@ -88,4 +93,4 @@ const BoutiquesList: React.FC = () => {
   );
 };
 
-export default BoutiquesList;
+export default BoutiqueList;
