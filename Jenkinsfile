@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "react_frontend:${BUILD_NUMBER}"
-        PATH = "/usr/local/bin:/opt/homebrew/bin:$PATH" // Assure l'accès à Docker sur Mac
+        PATH = "/usr/local/bin:/opt/homebrew/bin:$PATH" // Pour Mac (Docker via Homebrew)
     }
 
     stages {
@@ -23,7 +23,7 @@ pipeline {
                 }
             }
             steps {
-                echo "📦 Installing dependencies and building..."
+                echo "📦 Installing dependencies and building React..."
                 sh '''
                     npm ci
                     npm run build
@@ -32,6 +32,7 @@ pipeline {
         }
 
         stage('🐳 Docker build') {
+            agent any  // Reviens sur l'agent Jenkins principal pour exécuter Docker
             steps {
                 echo "🐳 Building Docker image ${IMAGE_NAME}..."
                 sh '''
