@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:20-alpine'
+            args '-v $HOME/.npm:/root/.npm' // cache npm
+        }
+    }
 
     environment {
         IMAGE_NAME = "react_frontend:${BUILD_NUMBER}"
@@ -25,9 +30,6 @@ pipeline {
         }
 
         stage('🐳 Docker build') {
-            environment {
-                PATH = "/opt/homebrew/bin:$PATH" // Si Docker est installé via Homebrew sur macOS
-            }
             steps {
                 echo "🐳 Building Docker image..."
                 sh '''
@@ -36,7 +38,6 @@ pipeline {
                 '''
             }
         }
-
     }
 
     post {
