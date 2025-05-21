@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   TextField,
   Button,
@@ -10,7 +10,12 @@ import {
   Alert,
   MenuItem
 } from '@mui/material';
-import { getProduit, createProduit, updateProduit } from '../../services/produits/produitService';
+import api from '../../services/api';
+import {
+  getProduit,
+  createProduit,
+  updateProduit
+} from '../../services/produits/produitService';
 import type { ProduitCreateDTO } from '../../services/produits/produitService';
 
 interface ProduitFormData {
@@ -29,9 +34,13 @@ interface ModeleOption {
 }
 
 const ProductForm: React.FC = () => {
-  const { id } = useParams();
-  const isEditMode = Boolean(id);
+  const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isEditMode = location.pathname.includes('/modifier');
+  const isCreationInBoutique = location.pathname.includes('/boutiques');
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [modeles, setModeles] = useState<ModeleOption[]>([]);
@@ -47,12 +56,10 @@ const ProductForm: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        
-        const modelesResponse = await fetch('/api/modeles/');
-        const modelesData: ModeleOption[] = await modelesResponse.json();
-        setModeles(modelesData);
+        const modelesResponse = await api.get('/modeles/');
+        setModeles(modelesResponse.data);
 
         if (isEditMode && id) {
           const produit = await getProduit(id);
@@ -65,9 +72,9 @@ const ProductForm: React.FC = () => {
             modele_id: produit.modele.modele_id.toString()
           });
         }
-      } catch (err) {
-        setError('Erreur lors du chargement des données');
+      } catch (err: any) {
         console.error(err);
+        setError(err.message || 'Erreur lors du chargement des données');
       } finally {
         setLoading(false);
       }
@@ -78,38 +85,48 @@ const ProductForm: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const produitData: ProduitCreateDTO = {
         nom_produit: formData.nom_produit,
-        modele_id: parseInt(formData.modele_id),
         prix: parseFloat(formData.prix),
         couleur: formData.couleur,
         capacite: parseFloat(formData.capacite),
-        ram: parseFloat(formData.ram)
+        ram: parseFloat(formData.ram),
+        modele_id: parseInt(formData.modele_id)
       };
+
+      // Ajoute l'ID de la boutique si on est en création dans une boutique
+      if (isCreationInBoutique && id) {
+        produitData.boutique_id = parseInt(id);
+      }
 
       if (isEditMode && id) {
         await updateProduit(id, produitData);
       } else {
         await createProduit(produitData);
       }
-      navigate('/produits');
-    } catch (error) {
-      setError('Erreur lors de la sauvegarde');
-      console.error(error);
+
+      const redirectPath = isCreationInBoutique && id
+        ? `/boutiques/${id}/produits`
+        : '/produits';
+
+      navigate(redirectPath);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Erreur lors de la sauvegarde');
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading && !isEditMode) {
+  if (loading) {
     return (
       <Container maxWidth="sm">
         <Box display="flex" justifyContent="center" mt={4}>
@@ -166,7 +183,7 @@ const ProductForm: React.FC = () => {
             onChange={handleChange}
             margin="normal"
             required
-            inputProps={{ step: "0.01", min: "0" }}
+            inputProps={{ step: '0.01', min: '0' }}
           />
 
           <TextField
@@ -202,7 +219,7 @@ const ProductForm: React.FC = () => {
           />
 
           <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
-            <Button variant="outlined" onClick={() => navigate('/produits')}>
+            <Button variant="outlined" onClick={() => navigate(-1)}>
               Annuler
             </Button>
             <Button

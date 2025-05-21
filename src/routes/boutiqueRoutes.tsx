@@ -7,11 +7,11 @@ const boutiqueRoutes = [
     element: <BoutiqueList />
   },
   {
-    path: '/boutiques/new',
+    path: '/boutiques/nouveau', // ✅ version française
     element: <BoutiqueForm />
   },
   {
-    path: '/boutiques/edit/:id',
+    path: '/boutiques/modifier/:id',
     element: <BoutiqueForm />
   }
 ];

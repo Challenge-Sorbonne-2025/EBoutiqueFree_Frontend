@@ -1,19 +1,25 @@
-// src/routes/produitRoutes.tsx
-
 import ProductForm from '../components/Produits/ProductForm';
 import ProductList from '../components/Produits/ProductList';
 
 const produitRoutes = [
   {
-    path: '/products',
+    path: '/produits',
     element: <ProductList />
   },
   {
-    path: '/products/new',
+    path: '/produits/nouveau',
     element: <ProductForm />
   },
   {
-    path: '/products/edit/:id',
+    path: '/produits/modifier/:id',
+    element: <ProductForm />
+  },
+  {
+    path: '/boutiques/:id/produits',
+    element: <ProductList />
+  },
+  {
+    path: '/boutiques/:id/produits/nouveau',
     element: <ProductForm />
   }
 ];

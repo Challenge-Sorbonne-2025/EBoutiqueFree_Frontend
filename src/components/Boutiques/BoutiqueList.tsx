@@ -1,95 +1,110 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Grid,
+  Pagination,
+  Typography,
+  Alert
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, List, ListItem, ListItemText, Button } from '@mui/material';
+
 import { getAllBoutiques } from '../../services/boutiques/boutiqueService';
-import BoutiqueDeleteButton from './BoutiqueDeleteButton';
-import type { Boutique } from './Boutique';
+import type { Boutique } from '../../components/Boutiques/boutiqueTypes';
 
-const BoutiqueList = () => {
+const BoutiqueList: React.FC = () => {
   const [boutiques, setBoutiques] = useState<Boutique[]>([]);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const [error, setError] = useState<string>('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchBoutiques = async () => {
-    try {
-      const data = await getAllBoutiques();
-      console.log(data)
-      if (Array.isArray(data)){
-        setBoutiques(data);
-      }
-      else if  (data.results && Array.isArray(data.results)) {
-                    // Si les données sont dans un champ 'results' (format courant de DRF)
-              setBoutiques(data.results);
-                }
-       else {
-              setError('Format de données incorrect');
-              console.error('Format de données reçu:', data);
-            }
-      
-    } catch (error) {
-      console.error('Erreur:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchBoutiques = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await getAllBoutiques(page, 6);
+        setBoutiques(data.results);
+        setTotalPages(Math.ceil(data.count / 6));
+      } catch (err) {
+        console.error(err);
+        setError("Erreur lors du chargement des boutiques");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchBoutiques();
-  }, []);
+  }, [page]);
 
-   if (error) {
-        return <Typography color="error">{error}</Typography>;
-    }
-
-    // Vérifier si products est bien un tableau avant d'utiliser map
-    if (!Array.isArray(boutiques)) {
-        return <Typography color="error">Erreur de format des données</Typography>;
-    }
-
-  if (loading) return <Typography>Chargement...</Typography>;
+  const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>Liste des boutiques</Typography>
-      
-      <Button
-        variant="contained"
-        onClick={() => navigate('/boutiques/new')}
-        sx={{ mb: 3 }}
-      >
-        Créer une boutique
-      </Button>
+    <Container>
+      <Box display="flex" justifyContent="space-between" alignItems="center" my={4}>
+        <Typography variant="h4">Liste des Boutiques</Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate('/boutiques/nouveau')}
+        >
+          Ajouter
+        </Button>
+      </Box>
 
-      <List>
-        {boutiques.map((boutique) => (
-          <ListItem
-            key={boutique.boutique_id}
-            divider
-            secondaryAction={
-              <>
-                <Button
-                  variant="outlined"
-                  onClick={() => navigate(`/boutiques/edit/${boutique.boutique_id}`)}
-                  sx={{ mr: 1 }}
-                >
-                  Modifier
-                </Button>
-                <BoutiqueDeleteButton 
-                  boutique_id={boutique.boutique_id} 
-                  onDeleted={fetchBoutiques} 
-                />
-              </>
-            }
-          >
-            <ListItemText
-              primary={boutique.nom_boutique}
-              secondary={`${boutique.adresse}, ${boutique.ville} (${boutique.code_postal})`}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </Box>
+      {error && <Alert severity="error">{error}</Alert>}
+
+      {loading ? (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Grid container spacing={3}>
+          {boutiques.map((boutique) => (
+            <Grid item xs={12} sm={6} md={4} key={boutique.boutique_id}>
+              <Box border={1} borderRadius={2} p={2}>
+                <Typography variant="h6">{boutique.nom_boutique}</Typography>
+                <Typography>{boutique.adresse}</Typography>
+                <Typography>{boutique.ville} - {boutique.code_postal}</Typography>
+                <Typography>{boutique.num_telephone}</Typography>
+                <Typography>{boutique.email}</Typography>
+
+                <Box mt={2} display="flex" justifyContent="space-between">
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => navigate(`/boutiques/modifier/${boutique.boutique_id}`)} // ✅ corrigé ici
+                  >
+                    Modifier
+                  </Button>
+
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => navigate(`/boutiques/${boutique.boutique_id}/produits`)}
+                  >
+                    Voir produits
+                  </Button>
+                </Box>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
+      <Box display="flex" justifyContent="center" mt={4}>
+        <Pagination count={totalPages} page={page} onChange={handlePageChange} />
+      </Box>
+    </Container>
   );
 };
 
