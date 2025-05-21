@@ -1,15 +1,9 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:20-alpine'  // Utilise un conteneur Node pour le build frontend
-            args '-v $HOME/.npm:/root/.npm'  // Cache npm
-        }
-    }
+    agent any  // Utilise directement l'agent Jenkins local (avec accès Docker)
 
     environment {
         IMAGE_NAME = "react_frontend:${BUILD_NUMBER}"
-        DOCKER_BUILDKIT = 1  // Active Docker BuildKit (optionnel mais recommandé)
-        PATH = "/usr/local/bin:/opt/homebrew/bin:$PATH"  // Chemin Docker si local
+        PATH = "/usr/local/bin:/opt/homebrew/bin:$PATH"  // Adapter à ton Mac
     }
 
     stages {
@@ -22,6 +16,12 @@ pipeline {
         }
 
         stage('📦 Install dependencies & build React app') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    args '-v $HOME/.npm:/root/.npm'
+                }
+            }
             steps {
                 echo "📦 Running npm ci and build..."
                 sh '''
