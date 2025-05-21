@@ -1,21 +1,21 @@
 pipeline {
-    agent any  // Utilise directement l'agent Jenkins local (avec accès Docker)
+    agent any
 
     environment {
         IMAGE_NAME = "react_frontend:${BUILD_NUMBER}"
-        PATH = "/usr/local/bin:/opt/homebrew/bin:$PATH"  // Adapter à ton Mac
+        PATH = "/usr/local/bin:/opt/homebrew/bin:$PATH" // Assure l'accès à Docker sur Mac
     }
 
     stages {
 
-        stage('📥 Checkout code') {
+        stage('📥 Checkout frontend') {
             steps {
                 echo "🔄 Cloning the frontend repository..."
                 checkout scm
             }
         }
 
-        stage('📦 Install dependencies & build React app') {
+        stage('📦 Build React app') {
             agent {
                 docker {
                     image 'node:20-alpine'
@@ -23,7 +23,7 @@ pipeline {
                 }
             }
             steps {
-                echo "📦 Running npm ci and build..."
+                echo "📦 Installing dependencies and building..."
                 sh '''
                     npm ci
                     npm run build
@@ -40,15 +40,14 @@ pipeline {
                 '''
             }
         }
-
     }
 
     post {
         always {
-            echo '🧼 Cleaning up build workspace if needed...'
+            echo '🧼 Cleaning up workspace (if needed)...'
         }
         success {
-            echo '🎉 Frontend CI pipeline completed successfully!'
+            echo '✅ Frontend pipeline completed successfully!'
         }
         failure {
             echo '❌ Frontend pipeline failed!'
