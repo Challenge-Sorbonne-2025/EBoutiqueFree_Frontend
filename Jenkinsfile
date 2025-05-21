@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "react_frontend:${BUILD_NUMBER}"
-        PATH = "/usr/local/bin:/opt/homebrew/bin:$PATH" // Pour Mac (Docker via Homebrew)
+        PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
     }
 
     stages {
@@ -32,7 +32,7 @@ pipeline {
         }
 
         stage('🐳 Docker build') {
-            agent any  // Reviens sur l'agent Jenkins principal pour exécuter Docker
+            agent any // Important : ici on revient sur ton Mac
             steps {
                 echo "🐳 Building Docker image ${IMAGE_NAME}..."
                 sh '''
@@ -41,11 +41,18 @@ pipeline {
                 '''
             }
         }
+
+        stage('✅ Check Docker access') {
+            steps {
+                sh 'which docker'
+                sh 'docker version'
+            }
+        }
     }
 
     post {
         always {
-            echo '🧼 Cleaning up workspace (if needed)...'
+            echo '🧼 Cleaning up workspace...'
         }
         success {
             echo '✅ Frontend pipeline completed successfully!'
