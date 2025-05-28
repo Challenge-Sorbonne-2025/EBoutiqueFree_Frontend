@@ -45,13 +45,6 @@ pipeline {
             }
         }
 
-        stage('✅ Check Docker access') {
-            steps {
-                sh 'which docker'
-                sh 'docker version'
-            }
-        }
-    }
 
     post {
         always {
