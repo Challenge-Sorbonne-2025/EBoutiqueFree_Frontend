@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "shop_app_Front:${BUILD_NUMBER}"
+        IMAGE_NAME = "shop_app_front:${BUILD_NUMBER}"
         PYTHONUNBUFFERED = 1
         PATH = "/opt/homebrew/bin:$PATH"
     }
