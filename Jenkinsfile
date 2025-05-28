@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        # VENV_DIR = 'venv'
         IMAGE_NAME = "shop_app_Front:${BUILD_NUMBER}"
         PYTHONUNBUFFERED = 1
     }
