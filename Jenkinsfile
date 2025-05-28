@@ -18,7 +18,7 @@ pipeline {
 
         stage('🐳 Docker Build React app') {
             steps {
-                echo "📦 Création de l’image Docker : ${env.IMAGE_NAME}"
+                echo "📦 Création de l’image Docker : ${IMAGE_NAME}"
                 sh '''
                     set -e
                     docker build -t ${IMAGE_NAME} .
@@ -33,7 +33,7 @@ pipeline {
                 sh '''
                     set -e
                     docker rm -f shop_container_front || true
-                    docker run -d --name shop_container_front -p 7000:7000 ${IMAGE_NAME}
+                    docker run -d --name shop_container_front -p 7000:3000 ${IMAGE_NAME}
                 '''
             }
         }
