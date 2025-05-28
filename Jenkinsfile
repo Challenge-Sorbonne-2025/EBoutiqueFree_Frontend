@@ -32,11 +32,8 @@ pipeline {
         }
 
         stage('🐳 Build Docker image') {
-            environment {
-                PATH = "/opt/homebrew/bin:$PATH"
-            }
             steps {
-                echo "📦 Création de l’image Docker : ${IMAGE_NAME}..."
+                echo "📦 Création de l’image Docker : ${env.IMAGE_NAME}..."
                 sh '''
                     set -e
                     docker build -t ${IMAGE_NAME} .
@@ -44,11 +41,12 @@ pipeline {
                 '''
             }
         }
-
+    }
 
     post {
         always {
             echo '🧼 Cleaning up workspace...'
+            cleanWs()
         }
         success {
             echo '✅ Frontend pipeline completed successfully!'
