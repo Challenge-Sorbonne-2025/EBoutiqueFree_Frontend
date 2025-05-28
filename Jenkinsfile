@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "shop_app_Front:${BUILD_NUMBER}"
         PYTHONUNBUFFERED = 1
-        PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+        PATH = "/opt/homebrew/bin:$PATH"
     }
 
     stages {
