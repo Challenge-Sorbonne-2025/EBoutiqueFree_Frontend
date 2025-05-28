@@ -31,11 +31,14 @@ pipeline {
             }
         }
 
-        stage('🐳 Docker build') {
-            agent any // Important : ici on revient sur ton Mac
+        stage('🐳 Build Docker image') {
+            environment {
+                PATH = "/opt/homebrew/bin:$PATH"
+            }
             steps {
-                echo "🐳 Building Docker image ${IMAGE_NAME}..."
+                echo "📦 Création de l’image Docker : ${IMAGE_NAME}..."
                 sh '''
+                    set -e
                     docker build -t ${IMAGE_NAME} .
                     docker tag ${IMAGE_NAME} react_frontend:latest
                 '''
