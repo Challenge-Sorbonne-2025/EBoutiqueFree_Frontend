@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "shop_app_Front:${BUILD_NUMBER}"
         PYTHONUNBUFFERED = 1
+        PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
     }
 
     stages {
@@ -15,13 +16,9 @@ pipeline {
             }
         }
 
-
-        stage('🐳 Docker Build React app) {
-            environment {
-                PATH = "/opt/homebrew/bin:$PATH"
-            }
+        stage('🐳 Docker Build React app') {
             steps {
-                echo "📦 Création de l’image Docker : ${IMAGE_NAME}"
+                echo "📦 Création de l’image Docker : ${env.IMAGE_NAME}"
                 sh '''
                     set -e
                     docker build -t ${IMAGE_NAME} .
@@ -31,15 +28,12 @@ pipeline {
         }
 
         stage('🚀 Run Docker container') {
-            environment {
-                PATH = "/opt/homebrew/bin:$PATH"
-            }
             steps {
                 echo "🚀 Démarrage du conteneur..."
                 sh '''
                     set -e
                     docker rm -f shop_container_front || true
-                    docker run  -d --name shop_container_front -p 8000:8000 ${IMAGE_NAME}
+                    docker run -d --name shop_container_front -p 3000:3000 ${IMAGE_NAME}
                 '''
             }
         }
@@ -48,7 +42,7 @@ pipeline {
     post {
         always {
             echo '🧹 Nettoyage des fichiers temporaires...'
-             cleanWs()
+            cleanWs()
         }
         success {
             echo '✅ Pipeline terminé avec succès.'
@@ -58,5 +52,3 @@ pipeline {
         }
     }
 }
-
-            
