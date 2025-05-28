@@ -2,38 +2,27 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "react_frontend:${BUILD_NUMBER}"
-        PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+        # VENV_DIR = 'venv'
+        IMAGE_NAME = "shop_app_Front:${BUILD_NUMBER}"
+        PYTHONUNBUFFERED = 1
     }
 
     stages {
 
-        stage('📥 Checkout frontend') {
+        stage('📥 Checkout Frontend code') {
             steps {
-                echo "🔄 Cloning the frontend repository..."
+                echo "🔄 Cloning the repository..."
                 checkout scm
             }
         }
 
-        stage('📦 Build React app') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    args '-v $HOME/.npm:/root/.npm'
-                }
-            }
-            steps {
-                echo "📦 Installing dependencies and building React..."
-                sh '''
-                    npm ci
-                    npm run build
-                '''
-            }
-        }
 
-        stage('🐳 Build Docker image') {
+        stage('🐳 Docker Build React app) {
+            environment {
+                PATH = "/opt/homebrew/bin:$PATH"
+            }
             steps {
-                echo "📦 Création de l’image Docker : ${env.IMAGE_NAME}..."
+                echo "📦 Création de l’image Docker : ${IMAGE_NAME}"
                 sh '''
                     set -e
                     docker build -t ${IMAGE_NAME} .
@@ -41,18 +30,34 @@ pipeline {
                 '''
             }
         }
+
+        stage('🚀 Run Docker container') {
+            environment {
+                PATH = "/opt/homebrew/bin:$PATH"
+            }
+            steps {
+                echo "🚀 Démarrage du conteneur..."
+                sh '''
+                    set -e
+                    docker rm -f shop_container_front || true
+                    docker run  -d --name shop_container_front -p 8000:8000 ${IMAGE_NAME}
+                '''
+            }
+        }
     }
 
     post {
         always {
-            echo '🧼 Cleaning up workspace...'
-            cleanWs()
+            echo '🧹 Nettoyage des fichiers temporaires...'
+             cleanWs()
         }
         success {
-            echo '✅ Frontend pipeline completed successfully!'
+            echo '✅ Pipeline terminé avec succès.'
         }
         failure {
-            echo '❌ Frontend pipeline failed!'
+            echo '❌ Échec du pipeline.'
         }
     }
 }
+
+            
