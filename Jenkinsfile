@@ -33,7 +33,7 @@ pipeline {
                 sh '''
                     set -e
                     docker rm -f shop_container_front || true
-                    docker run -d --name shop_container_front -p 7000:3000 ${IMAGE_NAME}
+                    docker run -d --name shop_container_front -p 7000:7000 ${IMAGE_NAME}
                 '''
             }
         }
