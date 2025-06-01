@@ -24,7 +24,7 @@ const produitRoutes = [
     element: <ProductForm />
   },
   {
-    path: '/produits/recherche', // ✅ Route de recherche
+    path: '/modeles/recherche', // ✅ Route de recherche
     element: <RechercheProduit />
   }
 ];
