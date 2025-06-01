@@ -1,5 +1,6 @@
 import BoutiqueList from '../components/Boutiques/BoutiqueList';
 import BoutiqueForm from '../components/Boutiques/BoutiqueForm';
+import RechercheBoutique from '../components/userInterface/RechercheBoutique';
 
 const boutiqueRoutes = [
   {
@@ -13,6 +14,10 @@ const boutiqueRoutes = [
   {
     path: '/boutiques/modifier/:id',
     element: <BoutiqueForm />
+  },
+  {
+    path: '/boutiques/recherche',
+    element: <RechercheBoutique />,
   }
 ];
 

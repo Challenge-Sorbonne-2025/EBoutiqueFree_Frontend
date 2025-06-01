@@ -1,5 +1,6 @@
 import ProductForm from '../components/Produits/ProductForm';
 import ProductList from '../components/Produits/ProductList';
+import RechercheProduit from '../components/userInterface/RechercheProduit';
 
 const produitRoutes = [
   {
@@ -21,6 +22,10 @@ const produitRoutes = [
   {
     path: '/boutiques/:id/produits/nouveau',
     element: <ProductForm />
+  },
+  {
+    path: '/produits/recherche', // ✅ Route de recherche
+    element: <RechercheProduit />
   }
 ];
 
