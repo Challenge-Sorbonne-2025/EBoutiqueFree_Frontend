@@ -21,7 +21,7 @@ export default function Login() {
         
         try {
             await login({ username, password });
-            navigate('/products');
+            navigate('/users');
         } catch (err) {
             setError('Erreur de connexion. Vérifiez vos identifiants.');
         }

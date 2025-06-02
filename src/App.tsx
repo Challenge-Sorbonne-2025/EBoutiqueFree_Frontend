@@ -3,7 +3,8 @@
 import { BrowserRouter as Router, useRoutes } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
 import produitRoutes from './routes/produitRoutes';
-import boutiqueRoutes from './routes/boutiqueRoutes'; // ✅ nouveau
+import boutiqueRoutes from './routes/boutiqueRoutes'; 
+import userRoutes from './routes/UserRoutes';
 import Login from './components/Accueils/Login';
 import StoreFinder from './components/Accueils/StoreFinder';
 import './App.css';
@@ -36,7 +37,8 @@ function AppRoutes() {
   const routes = useRoutes([
     ...generalRoutes,
     ...produitRoutes,
-    ...boutiqueRoutes // ✅ ajouté ici
+    ...boutiqueRoutes,
+    ...userRoutes,
   ]);
   return routes;
 }
@@ -44,7 +46,11 @@ function AppRoutes() {
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Router>
+      {/* add future={{ ... }} pour masquer les warnings dans la console */}
+      <Router 
+      future={{ 
+        v7_startTransition: true,
+        v7_relativeSplatPath: true}} >
         <AppRoutes />
       </Router>
     </ThemeProvider>

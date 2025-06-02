@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import { deleteProduit } from '../../services/produits/produitService';
 
 interface Props {
-  id: string; // type correct
+  id: number; // type correct
   onDeleted: () => void;
 }
 

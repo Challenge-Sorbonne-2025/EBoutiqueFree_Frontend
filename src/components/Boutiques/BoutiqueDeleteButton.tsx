@@ -6,14 +6,14 @@ import { deleteBoutique } from '../../services/boutiques/boutiqueService';
 
 // Typage du paramètre id comme string, car c'est ce que tu passes depuis BoutiqueList.tsx
 interface BoutiqueDeleteButtonProps {
-  id: string;
+  boutique_id: number;
   onDeleted: () => void;
 }
 
-const BoutiqueDeleteButton: React.FC<BoutiqueDeleteButtonProps> = ({ id, onDeleted }) => {
+const BoutiqueDeleteButton: React.FC<BoutiqueDeleteButtonProps> = ({ boutique_id, onDeleted }) => {
   const handleDelete = async () => {
     try {
-      await deleteBoutique(id); // Passer l'id comme string
+      await deleteBoutique(boutique_id); // Passer l'id comme string
       onDeleted(); // Appeler la fonction onDeleted pour mettre à jour la liste
     } catch (error) {
       console.error('Erreur lors de la suppression de la boutique:', error);

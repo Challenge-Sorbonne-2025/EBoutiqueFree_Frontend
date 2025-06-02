@@ -9,25 +9,31 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { getAllProduits } from '../../services/produits/produitService';
 import ProductDeleteButton from './ProductDeleteButton';
+import type {ProduitResponse} from './Produits';
 
-interface Product {
-  id: number;
-  nom: string;
-  prix: number;
-  couleur: string;
-  capacite: number;
-  ram: number;
-}
+
 
 const ProductList: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProduitResponse[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const fetchProducts = async () => {
     try {
-      const data = await getAllProduits();
-      setProducts(data);
-    } catch (err) {
+        const data = await getAllProduits();
+        // Vérifier si response.data est un tableau
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } 
+        else if (data.results && Array.isArray(data.results)) {
+            // Si les données sont dans un champ 'results' (format courant de DRF)
+            setProducts(data.results);
+        } else {
+            setError('Format de données incorrect');
+            console.error('Format de données reçu:', data);
+        }
+
+      } catch (err) {
       console.error('Erreur chargement produits :', err);
     }
   };
@@ -35,6 +41,15 @@ const ProductList: React.FC = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  if (error) {
+    return <Typography color="error">{error}</Typography>;
+  }
+  // Vérifier si products est bien un tableau avant d'utiliser map
+  if (!Array.isArray(products)) {
+      return <Typography color="error">Erreur de format des données</Typography>;
+    }
+
 
   return (
     <Box sx={{ p: 3 }}>
@@ -45,7 +60,7 @@ const ProductList: React.FC = () => {
         variant="contained"
         color="primary"
         sx={{ mb: 2 }}
-        onClick={() => navigate('/produits/new')}
+        onClick={() => navigate('/products/new')}
       >
         Ajouter un produit
       </Button>
@@ -55,22 +70,24 @@ const ProductList: React.FC = () => {
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))'
       }}>
         {products.map((product) => (
-          <Card key={product.id}>
+          <Card key={product.produit_id}>
             <CardContent>
-              <Typography variant="h6">{product.nom}</Typography>
+              <Typography variant="h6">{product.nom_produit}</Typography>
               <Typography>Prix: {product.prix}€</Typography>
               <Typography>Couleur: {product.couleur}</Typography>
               <Typography>Capacité: {product.capacite} Go</Typography>
               <Typography>RAM: {product.ram} Go</Typography>
+              <Typography>Marque: {product.modele.marque.marque}</Typography>
+              <Typography>Modele: {product.modele.modele}</Typography>
               <Box mt={2} sx={{ display: 'flex', gap: 1 }}>
                 <Button
                   variant="outlined"
-                  onClick={() => navigate(`/produits/edit/${product.id}`)}
+                  onClick={() => navigate(`/products/edit/${product.produit_id}`)}
                 >
                   Modifier
                 </Button>
                 <ProductDeleteButton
-                  id={product.id.toString()} // ✅ converti number → string
+                  id={product.produit_id} // ✅ converti number → string
                   onDeleted={fetchProducts}
                 />
               </Box>

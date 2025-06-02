@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AUTH_API_CONFIG } from '../config/api';
+import { AUTH_API_CONFIG } from '../config/config';
 import { getToken } from './auth';
 
 // Création d'une instance axios avec la configuration authentifiée

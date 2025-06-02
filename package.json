@@ -15,11 +15,18 @@
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@mui/icons-material": "^5.14.0",
     "@mui/material": "^5.15.6",
+    "@popperjs/core": "^2.11.8",
+    "@types/sortablejs": "^1.15.8",
+    "apexcharts": "^4.7.0",
     "axios": "^1.6.7",
+    "bootstrap": "^5.3.6",
+    "bootstrap-icons": "^1.13.1",
+    "jsvectormap": "^1.6.0",
     "mdb-react-ui-kit": "^9.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.3"
+    "react-router-dom": "^6.21.3",
+    "sortablejs": "^1.15.6"
   },
   "devDependencies": {
     "@types/react": "^18.2.48",
