@@ -86,8 +86,14 @@ const ProductList: React.FC = () => {
                 >
                   Modifier
                 </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate(`/products/${product.produit_id}`)}
+                >
+                  Voir plus
+                </Button>
                 <ProductDeleteButton
-                  id={product.produit_id} // ✅ converti number → string
+                  id={product.produit_id} 
                   onDeleted={fetchProducts}
                 />
               </Box>

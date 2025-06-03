@@ -21,7 +21,7 @@ export default function Header_accueil() {
                 
                 <div className="account-link">
                    <Link to="/" className="nav-link">Accueil</Link>
-                    <Link to="/login" className="nav-link account">Compte</Link>
+                    <Link to="/login" className="nav-link account">Connexion</Link>
                 </div>
             </div>
         </header>

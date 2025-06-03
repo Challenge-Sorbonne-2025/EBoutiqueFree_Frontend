@@ -2,6 +2,7 @@
 
 import ProductForm from '../components/Produits/ProductForm';
 import ProductList from '../components/Produits/ProductList';
+import DetailProduit from '../components/Produits/DetailProduit';
 
 const produitRoutes = [
   {
@@ -15,6 +16,10 @@ const produitRoutes = [
   {
     path: '/products/edit/:id',
     element: <ProductForm />
+  },
+  {
+    path : '/products/:id',
+    element: <DetailProduit/>
   }
 ];
 

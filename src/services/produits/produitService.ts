@@ -9,7 +9,7 @@ export const getAllProduits = async () => {
   return response.data;
 };
 
-export const getProduitById = async (id: string) => {
+export const getProduitById = async (id: number) => {
   const response = await publicApi.get(`/produits/${id}/`);
   return response.data;
 };
