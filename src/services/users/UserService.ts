@@ -32,6 +32,10 @@ export const getAllGestionnaires = async () => {
     return response.data;
 };
 
+export const getAllResponsables = async () => {
+    const response = await api.get('/users/allResponables/');
+    return response.data;
+}   
 
 
 

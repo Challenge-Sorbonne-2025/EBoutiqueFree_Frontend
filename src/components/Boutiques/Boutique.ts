@@ -31,6 +31,6 @@ export interface BoutiqueCreate {
     longitude: number;
     numero_telephone: string;
     email: string;
-    responsable: number;
-    gestionnaire: number[];
+    responsable: number | null;
+    gestionnaires: number[];
 }
