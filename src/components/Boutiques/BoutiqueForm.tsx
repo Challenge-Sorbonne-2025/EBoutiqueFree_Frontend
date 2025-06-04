@@ -299,7 +299,7 @@ export default function BoutiqueForm({
             <InputLabel>Responsable</InputLabel>
             <Select
               name="responsable"
-              value={formData.responsable}
+              value={formData.responsable || ''}
               onChange={handleSelectChange}
               label="Responsable"
             >
