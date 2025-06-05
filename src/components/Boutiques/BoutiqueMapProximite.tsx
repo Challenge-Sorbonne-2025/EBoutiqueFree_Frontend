@@ -32,6 +32,7 @@ const BoutiqueMapProximite = () => {
 
   // URL
   const API_BASE_URL = 'http://localhost:8000'; 
+  const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
   useEffect(() => {
     // Chargement de l'API Google Maps
     const loadGoogleMaps = () => {
@@ -41,7 +42,7 @@ const BoutiqueMapProximite = () => {
       }
 
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyC6iCA5P0ycIXnG_UMuxZWOYoA5fxK_XjA&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&libraries=places`;
       script.async = true;
       script.onload = () => {
         initializeAutocomplete();

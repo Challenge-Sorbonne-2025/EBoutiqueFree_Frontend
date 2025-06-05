@@ -102,6 +102,9 @@ git status uno
 ```
 afin de verifier s'il y'a de nouveau modification.
 
+## Google apiKey
+- Creer un fichier .env et Definissez votre cle api (voir exemple dans `.env.example`)
+
 ## Licence
 
 [MIT Licence]
