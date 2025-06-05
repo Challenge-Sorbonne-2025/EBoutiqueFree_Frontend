@@ -2,6 +2,7 @@
 
 import BoutiquesList from '../components/Boutiques/BoutiqueList';
 import BoutiqueForm from '../components/Boutiques/BoutiqueForm';
+import BoutiquesMapProximite from '../components/Boutiques/BoutiqueMapProximite';
 
 const boutiqueRoutes = [
   {
@@ -15,6 +16,11 @@ const boutiqueRoutes = [
   {
     path: '/boutiques/edit/:id',
     element: <BoutiqueForm />
+  }, 
+
+  {
+    path  : '/boutiques/map',
+    element: <BoutiquesMapProximite />
   }
 ];
 

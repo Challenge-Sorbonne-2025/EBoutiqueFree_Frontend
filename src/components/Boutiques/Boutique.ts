@@ -34,3 +34,16 @@ export interface BoutiqueCreate {
     responsable: number | null;
     gestionnaires: number[];
 }
+
+ export interface Boutique {
+    lat: string;
+    lon: string;
+    boutique: string;
+    ville: string;
+    adresse: string;
+    produit: string;
+    marque: string;
+    modele: string;
+    prix: number;
+    quantite: number;
+  }

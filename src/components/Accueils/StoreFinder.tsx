@@ -14,7 +14,7 @@ export default function StoreFinder() {
                     <div className="search-form">
                         <div className="search-fields">
                             <div className="field">
-                                <Link to="/boutiques" className="search-input">
+                                <Link to="/boutiques/map" className="search-input">
                                     Trouver la boutique la plus proche
                                 </Link>
                             </div>
