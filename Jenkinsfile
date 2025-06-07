@@ -16,16 +16,10 @@ pipeline {
         }
 
         stage('📦 Install & Build React app') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    args '-v $HOME/.npm:/root/.npm'
-                }
-            }
             steps {
                 echo "📦 Installing dependencies and building the app..."
                 sh '''
-                    npm ci
+                    npm install
                     npm run build
                 '''
             }
@@ -33,9 +27,8 @@ pipeline {
 
         stage('🐳 Docker Build React app') {
             steps {
-                echo "📦 Création de l’image Docker : ${env.IMAGE_NAME}"
+                echo "📦 Création de l’image Docker : ${IMAGE_NAME}"
                 sh '''
-                    set -e
                     docker build -t ${IMAGE_NAME} .
                     docker tag ${IMAGE_NAME} react_frontend:latest
                 '''
@@ -46,7 +39,6 @@ pipeline {
             steps {
                 echo "🚀 Démarrage du conteneur..."
                 sh '''
-                    set -e
                     docker rm -f shop_container_front || true
                     docker run -d --name shop_container_front -p 3000:80 ${IMAGE_NAME}
                 '''
