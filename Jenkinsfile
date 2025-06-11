@@ -26,7 +26,7 @@ pipeline {
                 echo "📦 Installing dependencies and building..."
                 sh '''
                     npm ci
-                    npm run build // run dev                    
+                    npm run build dev                    
                 '''
             }
         }
