@@ -3,41 +3,47 @@ pipeline {
 
     environment {
         IMAGE_NAME = "shop_app_front:${BUILD_NUMBER}"
-        PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+        NODE_ENV = "production"
     }
 
     stages {
 
-        stage('📥 Checkout Frontend code') {
+        stage('📥 Checkout code') {
             steps {
                 echo "🔄 Cloning the repository..."
                 checkout scm
             }
         }
 
-        stage('📦 Install & Build React app') {
+        stage('📦 Build React App') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    args '-v $HOME/.npm:/root/.npm'
+                }
+            }
             steps {
-                echo "📦 Installing dependencies and building the app..."
+                echo "📦 Installing dependencies and building..."
                 sh '''
-                    npm install
-                    npm run build
+                    npm ci
+                    npm run build // run dev                    
                 '''
             }
         }
 
-        stage('🐳 Docker Build React app') {
+        stage('🐳 Build Docker Image') {
             steps {
-                echo "📦 Création de l’image Docker : ${IMAGE_NAME}"
+                echo "🐳 Building docker image..."
                 sh '''
                     docker build -t ${IMAGE_NAME} .
-                    docker tag ${IMAGE_NAME} react_frontend:latest
+                    docker tag ${IMAGE_NAME} shop_app_front:latest
                 '''
             }
         }
 
-        stage('🚀 Run Docker container') {
+        stage('🚀 Run Docker Container') {
             steps {
-                echo "🚀 Démarrage du conteneur..."
+                echo "🚀 Running docker container..."
                 sh '''
                     docker rm -f shop_container_front || true
                     docker run -d --name shop_container_front -p 3000:80 ${IMAGE_NAME}
@@ -48,14 +54,8 @@ pipeline {
 
     post {
         always {
-            echo '🧹 Nettoyage des fichiers temporaires...'
+            echo '🧹 Cleaning up workspace...'
             cleanWs()
-        }
-        success {
-            echo '✅ Pipeline terminé avec succès.'
-        }
-        failure {
-            echo '❌ Échec du pipeline.'
         }
     }
 }
