@@ -32,18 +32,27 @@ export interface BoutiqueCreate {
     numero_telephone: string;
     email: string;
     responsable: number | null;
-    gestionnaires: number[];
 }
 
  export interface Boutique {
-    lat: string;
-    lon: string;
-    boutique: string;
-    ville: string;
-    adresse: string;
-    produit: string;
-    marque: string;
-    modele: string;
-    prix: number;
-    quantite: number;
-  }
+  boutique_id: number;
+  nom_boutique: string;
+  adresse: string;
+  ville: string;
+  code_postal: string;
+  departement?: string;
+  longitude?: number | null;
+  latitude?: number | null;
+  num_telephone?: string | null;
+  email?: string | null;
+  date_creation?: string;
+  date_maj?: string;
+  responsable?: ResponsableOUGestionnaireBoutique | null;
+}
+
+  export interface BoutiquesResponsePage {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Boutique[];
+}

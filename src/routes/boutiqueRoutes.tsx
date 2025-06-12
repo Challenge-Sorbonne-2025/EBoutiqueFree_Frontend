@@ -10,7 +10,7 @@ const boutiqueRoutes = [
     element: <BoutiquesList />
   },
   {
-    path: '/boutiques/new',
+    path: '/boutiques/nouveau',
     element: <BoutiqueForm />
   },
   {

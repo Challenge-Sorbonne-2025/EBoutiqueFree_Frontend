@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { TextField, Button, Container, Typography, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, FormControl, InputLabel, Select, MenuItem, CircularProgress } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
 import {
   createProduit,
@@ -10,47 +10,33 @@ import {
 import type { ProduitCreate } from './Produits';
 import { getAllBoutiques } from '../../services/boutiques/boutiqueService';
 import { getAllModeles } from '../../services/produits/ModeleService';
+
 const ProductForm: React.FC = () => {
-  const { produit_id } = useParams(); // id est une string ou undefined
-  const isEditMode = Boolean(produit_id);
+  const { produit_id } = useParams();
   const navigate = useNavigate();
+  
+  // Initialisation avec des valeurs par défaut appropriées
   const [formData, setFormData] = useState<ProduitCreate>({
-    boutique_id: 0,
-    quantite_initiale: 0,
+    boutique_id: '',
+    quantite_initiale: '',
     nom_produit: '',
-    prix: 0,
+    prix: '',
     couleur: '',
-    capacite: 0,
-    ram: 0,
-    modele: 0 ,
-   
+    capacite: '',
+    image: '',  
+    ram: '',
+    modele: '',
   });
+  
   const [boutiques, setBoutiques] = useState<any[]>([]);
   const [modeles, setModeles] = useState<any[]>([]);
+  const isEditMode = location.pathname.includes('/edit');
+  const isCreationInBoutique = location.pathname.includes('/boutiques');
+  const [loading, setLoading] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false); // Nouveau state pour tracker le chargement des données
+  const [error, setError] = useState<string | null>(null);
 
-  // Charger les données du produit si en mode modification
-  useEffect(() => {
-    if (isEditMode && produit_id) {
-      getProduitById(produit_id).then((data) => {
-        setFormData({
-          nom_produit: data.nom_produit,
-          prix: data.prix,
-          couleur: data.couleur,
-          capacite: data.capacite,
-          ram: data.ram,
-          boutique_id: data.boutique_id,
-          quantite_initiale: data.quantite_initiale,
-          modele: data.modele,
-        });
-      }).catch((err) => {
-        console.error('Erreur chargement produit :', err);
-      });
-    }
-  }, [produit_id, isEditMode]);
-
-  // ===========================================================================================
-  // Recuperation des Boutiques existantes avant l'ajout ou la modification d'un produit
-  // ===========================================================================================
+  // Chargement des boutiques
   useEffect(() => {
     const fetchBoutiques = async () => {
       try {
@@ -71,9 +57,7 @@ const ProductForm: React.FC = () => {
     fetchBoutiques();
   }, []);
 
-  // ===========================================================================================
-  // Recuperation des Modeles existants avant l'ajout ou la modification d'un produit
-  // ===========================================================================================
+  // Chargement des modèles
   useEffect(() => {
     const fetchModeles = async () => {
       try {
@@ -91,35 +75,131 @@ const ProductForm: React.FC = () => {
     fetchModeles();
   }, []);
 
+  // Chargement du produit pour l'édition - VERSION AVEC DEBUG
+  useEffect(() => {
+    console.log('🔍 useEffect déclenché - isEditMode:', isEditMode, 'produitId:', produit_id);
+    
+    const fetchProduit = async () => {  
+      if (!isEditMode || !produit_id) {
+        console.log('❌ Pas de chargement - isEditMode:', isEditMode, 'produitId:', produit_id);
+        setDataLoaded(true);
+        return;
+      }
+
+      console.log('🚀 Début du chargement du produit...');
+      setLoading(true);
+      setError(null);
+      
+      try {
+        console.log('📡 Appel API getProduitById avec ID:', produit_id);
+        const data = await getProduitById(produit_id);
+        
+        console.log('✅ Données reçues de l\'API:', data);
+        console.log('🏪 Boutiques:', data.boutiques);
+        console.log('📱 Modèle:', data.modele);
+        
+        const premiereBoutique = data.boutiques?.[0];
+        console.log('🎯 Première boutique sélectionnée:', premiereBoutique);
+        
+        const newFormData = {
+          boutique_id: premiereBoutique?.boutique_id?.toString() || '',
+          quantite_initiale: premiereBoutique?.quantite?.toString() || '',
+          nom_produit: data.nom_produit || '',
+          prix: data.prix || '',
+          couleur: data.couleur || '',
+          capacite: data.capacite || '',
+          image: data.image || '',
+          ram: data.ram || '',
+          modele: data.modele?.modele_id?.toString() || '',
+        };
+        
+        console.log('📝 Nouvelles données du formulaire:', newFormData);
+        setFormData(newFormData);
+        
+        // Vérification après setFormData
+        setTimeout(() => {
+          console.log('⏰ FormData après setState (dans timeout):', newFormData);
+        }, 100);
+        
+        setDataLoaded(true);
+        console.log('✅ Chargement terminé avec succès');
+      } catch (error) {
+        console.error('❌ Erreur lors de la récupération du produit:', error);
+        setError('Erreur lors de la récupération du produit');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduit();
+  }, [produit_id, isEditMode]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSelectChange = (e: SelectChangeEvent<number>) => {
+  const handleSelectChange = (e: SelectChangeEvent<string>) => { // ✅ Type corrigé
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
+    // ✅ Conversion des strings en numbers pour l'API
     const payload = {
       ...formData,
-      prix: formData.prix,
-      capacite: formData.capacite,
-      ram: formData.ram
+      boutique_id: Number(formData.boutique_id),
+      quantite_initiale: Number(formData.quantite_initiale),
+      prix: Number(formData.prix),
+      capacite: Number(formData.capacite),
+      ram: Number(formData.ram),
+      modele: Number(formData.modele)
     };
 
     try {
       if (isEditMode && produit_id) {
         await updateProduit(produit_id, payload);
       } else {
+        if (isCreationInBoutique && produit_id) {
+          payload.boutique_id = parseInt(produit_id);
+        }
         await createProduit(payload);
       }
-      navigate('/products');
-    } catch (error) {
+
+      const redirectPath = isCreationInBoutique && produit_id
+        ? `/boutiques/${produit_id}/produits`
+        : '/products';
+      navigate(redirectPath);
+    } catch (error: any) {
       console.error('Erreur lors de la soumission :', error);
+      setError(error.message || 'Erreur lors de la soumission du formulaire');
+    } finally {
+      setLoading(false);
     }
   };
+
+  // ✅ Affichage du loading pendant que les données se chargent
+  if (loading || (isEditMode && !dataLoaded)) {
+    return (
+      <Container maxWidth="sm">
+        <Box display="flex" justifyContent="center" mt={4}>
+          <CircularProgress />
+          <Typography ml={2}>Chargement...</Typography>
+        </Box>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container maxWidth="sm">
+        <Box mt={4}>
+          <Typography color="error">{error}</Typography>
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="sm">
@@ -143,12 +223,80 @@ const ProductForm: React.FC = () => {
               ))}
             </Select>
           </FormControl>
-          <TextField fullWidth label="Quantité initiale" name="quantite_initiale" value={formData.quantite_initiale} onChange={handleChange} margin="normal" required />
-          <TextField fullWidth label="Nom" name="nom_produit" value={formData.nom_produit} onChange={handleChange} margin="normal" required />
-          <TextField fullWidth label="Prix" name="prix" value={formData.prix} onChange={handleChange} margin="normal" required />
-          <TextField fullWidth label="Couleur" name="couleur" value={formData.couleur} onChange={handleChange} margin="normal" required />
-          <TextField fullWidth label="Capacité" name="capacite" value={formData.capacite} onChange={handleChange} margin="normal" required />
-          <TextField fullWidth label="RAM" name="ram" value={formData.ram} onChange={handleChange} margin="normal" required />
+          
+          <TextField 
+            fullWidth 
+            label="Quantité initiale" 
+            name="quantite_initiale" 
+            value={formData.quantite_initiale} 
+            onChange={handleChange} 
+            margin="normal" 
+            required 
+            type="number"
+          />
+          
+          <TextField 
+            fullWidth 
+            label="Nom" 
+            name="nom_produit" 
+            value={formData.nom_produit} 
+            onChange={handleChange} 
+            margin="normal" 
+            required 
+          />
+          
+          <TextField 
+            fullWidth 
+            label="Prix" 
+            name="prix" 
+            value={formData.prix} 
+            onChange={handleChange} 
+            margin="normal" 
+            required 
+            type="number"
+          />
+          
+          <TextField 
+            fullWidth 
+            label="Couleur" 
+            name="couleur" 
+            value={formData.couleur} 
+            onChange={handleChange} 
+            margin="normal" 
+            required 
+          />
+          
+          <TextField 
+            fullWidth 
+            label="Capacité" 
+            name="capacite" 
+            value={formData.capacite} 
+            onChange={handleChange} 
+            margin="normal" 
+            required 
+            type="number"
+          />
+          
+          <TextField 
+            fullWidth 
+            label="Image URL" 
+            name="image" 
+            value={formData.image} 
+            onChange={handleChange} 
+            margin="normal"  
+          />
+          
+          <TextField 
+            fullWidth 
+            label="RAM" 
+            name="ram" 
+            value={formData.ram} 
+            onChange={handleChange} 
+            margin="normal" 
+            required 
+            type="number"
+          />
+          
           <FormControl fullWidth margin="normal" required>
             <InputLabel>Modele</InputLabel>
             <Select
@@ -164,9 +312,10 @@ const ProductForm: React.FC = () => {
               ))}
             </Select>
           </FormControl>
-         <Box mt={2}>
-            <Button type="submit" variant="contained" color="primary" fullWidth>
-              {isEditMode ? 'Mettre à jour' : 'Créer'}
+          
+          <Box mt={2}>
+            <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : isEditMode ? 'Mettre à jour' : 'Créer'}
             </Button>
           </Box>
         </form>

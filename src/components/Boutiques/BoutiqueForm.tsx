@@ -1,63 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  TextField,
+  Box,
   Button,
   Container,
+  TextField,
   Typography,
-  Box,
+  CircularProgress,
+  Alert,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Checkbox,
-  ListItemText,
-  Grid,
-  CircularProgress,
-  FormHelperText,
-  OutlinedInput
+  type SelectChangeEvent
 } from '@mui/material';
-import type { SelectChangeEvent } from '@mui/material';
-import type { BoutiqueCreate } from './Boutique';
-import { getAllGestionnaires, getAllResponsables } from '../../services/users/UserService';
-import { updateBoutique, createBoutique } from '../../services/boutiques/boutiqueService';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-interface Props {
-  initialValues?: Partial<BoutiqueCreate>;
-  loading?: boolean;
-  onSuccess?: () => void;
-  onError?: (error: unknown) => void;
+import type { Boutique } from './Boutique';
+import { createBoutique, getBoutiqueById, updateBoutique } from '../../services/boutiques/boutiqueService';
+import { getAllResponsables } from '../../services/users/UserService';
+
+interface BoutiqueFormData {
+  nom_boutique: string;
+  adresse: string;
+  ville: string;
+  code_postal: string;
+  departement?: string;
+  longitude?: string;
+  latitude?: string;
+  num_telephone?: string;
+  email?: string;
+  responsable: number | null;
 }
 
-export default function BoutiqueForm({
+const BoutiqueForm: React.FC = () => {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id?: string }>();
 
-  initialValues = {},
-  loading = false, 
- 
-}: Props) {
-  const [formData, setFormData] = useState<BoutiqueCreate>({
+  const [formData, setFormData] = useState<BoutiqueFormData>({
     nom_boutique: '',
     adresse: '',
     ville: '',
     code_postal: '',
     departement: '',
-    longitude: 0,
-    latitude: 0,
-    numero_telephone: '',
-    email: '',
-    responsable: null,
-    gestionnaires: [] as number[],
-    ...initialValues
+    longitude: '',
+    latitude: '',
+    num_telephone: '',
+    email: '', 
+    responsable: null
   });
- const {id } = useParams();
- const navigate = useNavigate();
-  const [responsables, setResponsables] = useState<{id: number, username: string}[]>([]);
-  const [gestionnaires, setGestionnaires] = useState<{id: number, username: string}[]>([]);
-  const [formErrors, setFormErrors] = useState<Partial<BoutiqueCreate>>({});
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [responsables, setResponsables] = useState<{id: number, username: string}[]>([]);
+
+  // Récupérer les responsables au chargement du composant
   useEffect(() => {
-    // Charger les responsables et gestionnaires disponibles
-    const fetchUsers = async () => {
+    const fetchResponsables = async () => {
       try {
         const responsablesRes = await getAllResponsables();
         if (Array.isArray(responsablesRes)) {
@@ -69,43 +67,48 @@ export default function BoutiqueForm({
         } else {
           console.error("La réponse des responsables n'est pas un tableau", responsablesRes);
         }
-
-        const gestionnairesRes = await getAllGestionnaires();
-        if (Array.isArray(gestionnairesRes)) {
-          setGestionnaires(gestionnairesRes.map(user => ({
-            id: user.profile_id,
-            username: user.username
-          })));
-          console.log("Gestionnaires chargés avec succès", gestionnairesRes);
-        } else {
-          console.error("La réponse des gestionnaires n'est pas un tableau", gestionnairesRes);   
-        }
-      } catch (error) {
-        console.error("Erreur lors du chargement des utilisateurs", error);
+      } catch (err) {
+        console.error("Erreur lors du chargement des responsables", err);
+        setError("Erreur lors du chargement des responsables");
       }
     };
-    
-    fetchUsers();
+
+    fetchResponsables();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Efface l'erreur quand l'utilisateur modifie le champ
-    if (formErrors[name as keyof BoutiqueCreate]) {
-      setFormErrors(prev => ({ ...prev, [name]: undefined }));
+  // Récupérer les données de la boutique si on est en mode édition
+  useEffect(() => {
+    if (id && responsables.length > 0) {
+      const fetchBoutique = async () => {
+        setLoading(true);
+        try {
+          const data: Boutique = await getBoutiqueById(id);
+          setFormData({
+            nom_boutique: data.nom_boutique,
+            adresse: data.adresse,
+            ville: data.ville,
+            code_postal: data.code_postal,
+            departement: data.departement || '',
+            longitude: data.longitude?.toString() || '',
+            latitude: data.latitude?.toString() || '',
+            num_telephone: data.num_telephone || '',
+            email: data.email || '',
+            responsable: data.responsable?.id || null
+          });
+        } catch (err) {
+          setError("Erreur lors du chargement de la boutique");
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchBoutique();
     }
-  };
+  }, [id, responsables]);
 
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value ? parseFloat(value) : 0,
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (e: SelectChangeEvent<number>) => {
@@ -116,258 +119,118 @@ export default function BoutiqueForm({
     }));
   };
 
-  const handleGestionnairesChange = (e: SelectChangeEvent<typeof formData.gestionnaires>) => {
-  const value = e.target.value;
-  setFormData(prev => ({
-    ...prev,
-    gestionnaires: typeof value === 'string'
-      ? value.split(',').map(Number)
-      : value,
-  }));
-};
-
-  const validateForm = (): boolean => {
-    const errors: Partial<BoutiqueCreate> = {};
-    
-    if (!formData.nom_boutique) errors.nom_boutique = 'Requis';
-    if (!formData.adresse) errors.adresse = 'Requis';
-    if (!formData.ville) errors.ville = 'Requis';
-    if (!formData.code_postal) errors.code_postal = 'Requis';
-    
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+  const validate = (): boolean => {
+    if (!formData.nom_boutique.trim()) return setError("Nom requis"), false;
+    if (!formData.adresse.trim()) return setError("Adresse requise"), false;
+    if (!formData.ville.trim()) return setError("Ville requise"), false;
+    if (!formData.code_postal.trim()) return setError("Code postal requis"), false;
+    if (formData.email && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email))
+      return setError("Format d'email invalide"), false;
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      console.error('Validation failed', formErrors);
-      return;
-    }
-    try{
-      if (id !== undefined || initialValues && Object.keys(initialValues).length > 0) {
-        // Logique de mise à jour de la boutique
-        console.log('Mise à jour de la boutique avec les données:', formData);        
-          await updateBoutique(Number(id), formData);
-          navigate(`/boutiques`); // Redirection vers la page de la boutique après mise à jour
+    setError(null);
+    if (!validate()) return;
+    setLoading(true);
+
+    const longitude = formData.longitude ? parseFloat(formData.longitude) : null;
+    const latitude = formData.latitude ? parseFloat(formData.latitude) : null;
+
+    const formattedData = {
+      ...formData,
+      longitude: isNaN(longitude!) ? null : longitude,
+      latitude: isNaN(latitude!) ? null : latitude,
+    };
+
+    try {
+      if (id) {
+        await updateBoutique(id, formattedData);
+      } else {
+        await createBoutique(formattedData);
       }
-      else {
-        // Logique de création de la boutique
-        console.log('Création d\'une nouvelle boutique avec les données:', formData);
-        await createBoutique(formData);
-        navigate('/boutiques'); // Redirection vers la liste des boutiques après création
-      }
-      
+      navigate('/boutiques');
+    } catch (err) {
+      console.error(err);
+      setError("Erreur lors de la sauvegarde de la boutique");
+    } finally {
+      setLoading(false);
     }
-    catch (error) {
-      console.error('Erreur lors de la soumission du formulaire:', error);      
   };
-}
 
-  
   return (
-    <Container maxWidth="md">
-      <Box mt={4}>
+    <Container maxWidth="sm">
+      <Box my={4}>
         <Typography variant="h5" gutterBottom>
-          {initialValues && Object.keys(initialValues).length > 0 ? 'Modifier la boutique' : 'Ajouter une boutique'}
+          {id ? "Modifier la boutique" : "Ajouter une nouvelle boutique"}
         </Typography>
-        
-        <form onSubmit={handleSubmit}>
-          {/* Nom de la boutique */}
-          <TextField
-            fullWidth
-            label="Nom de la boutique"
-            name="nom_boutique"
-            value={formData.nom_boutique}
-            onChange={handleChange}
-            margin="normal"
-            required
-            error={Boolean(formErrors.nom_boutique)}
-            helperText={formErrors.nom_boutique}
-          />
 
-          {/* Adresse */}
-          <TextField
-            fullWidth
-            label="Adresse"
-            name="adresse"
-            value={formData.adresse}
-            onChange={handleChange}
-            margin="normal"
-            required
-            error={Boolean(formErrors.adresse)}
-            helperText={formErrors.adresse}
-          />
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-          {/* Ville et Code postal */}
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Ville"
-                name="ville"
-                value={formData.ville}
-                onChange={handleChange}
-                margin="normal"
-                required
-                error={Boolean(formErrors.ville)}
-                helperText={formErrors.ville}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Code postal"
-                name="code_postal"
-                value={formData.code_postal}
-                onChange={handleChange}
-                margin="normal"
-                required
-                error={Boolean(formErrors.code_postal)}
-                helperText={formErrors.code_postal}
-              />
-            </Grid>
-          </Grid>
-
-          {/* Département */}
-          <TextField
-            fullWidth
-            label="Département"
-            name="departement"
-            value={formData.departement}
-            onChange={handleChange}
-            margin="normal"
-          />
-
-          {/* Coordonnées GPS */}
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Longitude"
-                name="longitude"
-                type="number"
-                inputProps={{ step: 'any' }}
-                value={formData.longitude || ''}
-                onChange={handleNumberChange}
-                margin="normal"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Latitude"
-                name="latitude"
-                type="number"
-                inputProps={{ step: 'any' }}
-                value={formData.latitude || ''}
-                onChange={handleNumberChange}
-                margin="normal"
-              />
-            </Grid>
-          </Grid>
-
-          {/* Téléphone et Email */}
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Téléphone"
-                name="numero_telephone"
-                type="tel"
-                value={formData.numero_telephone}
-                onChange={handleChange}
-                margin="normal"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                margin="normal"
-              />
-            </Grid>
-          </Grid>
-
-          {/* Responsable */}
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Responsable</InputLabel>
-            <Select
-              name="responsable"
-              value={formData.responsable || ''}
-              onChange={handleSelectChange}
-              label="Responsable"
-            >
-              <MenuItem value="">
-                <em>Sélectionner un responsable</em>
-              </MenuItem>
-              {responsables.map(user => (
-                <MenuItem key={user.id} value={user.id}>
-                  {user.username}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Gestionnaires */}
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Gestionnaires</InputLabel>
-            <Select
-             name='gestionnaires'
-              multiple
-              value={formData.gestionnaires}
-              onChange={handleGestionnairesChange}
-              input={<OutlinedInput label="Gestionnaires" />}
-              // renderValue={(selected) => (
-              //   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              //     {selected.map((value) => {
-              //       const gestionnaire = gestionnaires.find(g => g.id === value);
-              //       return (
-              //         <Chip key={value} label={gestionnaire?.username || value} size="small" />
-              //       );
-              //     })}
-              //   </Box>
-              // )}
-
-                            renderValue={(selected) =>
-                    gestionnaires
-                      .filter((g) => selected.includes(g.id))
-                      .map((g) => g.username)
-                      .join(', ')
-                  }
-            >
-              {gestionnaires.map(gestionnaire => (
-                <MenuItem key={gestionnaire.id} value={gestionnaire.id}>
-                  {/* {gestionnaire.username} */}
-                  <Checkbox checked={formData.gestionnaires.includes(gestionnaire.id)} />
-                  <ListItemText primary={gestionnaire.username} />
-                </MenuItem>
-              ))}
-            </Select>
-            <FormHelperText>
-              Sélectionnez un ou plusieurs gestionnaires
-            </FormHelperText>
-          </FormControl>
-
-          <Box mt={3}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              disabled={loading}
-              startIcon={loading ? <CircularProgress size={20} /> : null}
-            >
-              {loading ? 'En cours...' : 'Valider la boutique'}
-            </Button>
+        {loading ? (
+          <Box display="flex" justifyContent="center" mt={4}>
+            <CircularProgress />
           </Box>
-        </form>
+        ) : (
+          <form onSubmit={handleSubmit} noValidate>
+            {[
+              { label: "Nom de la boutique", name: "nom_boutique", required: true },
+              { label: "Adresse", name: "adresse", required: true },
+              { label: "Ville", name: "ville", required: true },
+              { label: "Code Postal", name: "code_postal", required: true },
+              { label: "Département", name: "departement" },
+              { label: "Longitude", name: "longitude" },
+              { label: "Latitude", name: "latitude" },
+              { label: "Numéro de téléphone", name: "num_telephone" },
+              { label: "Email", name: "email", type: "email" }
+            ].map(({ label, name, type, required }) => (
+              <TextField
+                key={name}
+                label={label}
+                name={name}
+                type={type || 'text'}
+                value={formData[name as keyof BoutiqueFormData] || ''}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                required={required}
+              />
+            ))}
+            
+            {/* Responsable */}
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Responsable</InputLabel>
+              <Select
+                name="responsable"
+                value={formData.responsable || ''}
+                onChange={handleSelectChange}
+                label="Responsable"
+              >
+                <MenuItem value="">
+                  <em>Sélectionner un responsable</em>
+                </MenuItem>
+                {responsables.map(user => (
+                  <MenuItem key={user.id} value={user.id}>
+                    {user.username}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <Box mt={3} display="flex" justifyContent="space-between">
+              <Button variant="outlined" onClick={() => navigate('/boutiques')}>
+                Annuler
+              </Button>
+              <Button type="submit" variant="contained" color="primary">
+                {id ? "Mettre à jour" : "Ajouter"}
+              </Button>
+            </Box>
+          </form>
+        )}
       </Box>
     </Container>
   );
-}
+};
+
+export default BoutiqueForm;

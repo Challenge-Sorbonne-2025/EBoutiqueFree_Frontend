@@ -32,7 +32,7 @@ const BoutiqueMapProximite = () => {
 
   // URL
   const API_BASE_URL = 'http://localhost:8000'; 
-  const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
+  const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   useEffect(() => {
     // Chargement de l'API Google Maps
     const loadGoogleMaps = () => {
@@ -106,6 +106,26 @@ const BoutiqueMapProximite = () => {
       setIsLoading(false);
     }
   };
+
+  // Fonction pour calculer la distance entre deux points (formule de Haversine)
+  const calculateDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ): number => {
+    const R = 6371; // Rayon de la Terre en kilomètres
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distance = R * c; // Distance en kilomètres
+    return distance;
+  };
+
   const fetchBoutiques = async (
     userCoords: { lat: number; lng: number },
     mapInstance: any
@@ -136,6 +156,18 @@ const BoutiqueMapProximite = () => {
           lat: parseFloat(boutique.lat), 
           lng: parseFloat(boutique.lon) 
         };
+        // Calculer la distance
+        const distance = calculateDistance(
+          userCoords.lat, 
+          userCoords.lng, 
+          boutiquePosition.lat, 
+          boutiquePosition.lng
+        );
+
+         const distanceText = distance < 1 
+          ? `${Math.round(distance * 1000)} m` 
+          : `${distance.toFixed(1)} km`;
+
 
         const infoContent = `
           <div style="max-width: 300px;">
@@ -144,9 +176,8 @@ const BoutiqueMapProximite = () => {
             <p><strong>Adresse:</strong> ${boutique.adresse}</p>
             <p><strong>Produit:</strong> ${boutique.produit}</p>
             <p><strong>Marque:</strong> ${boutique.marque}</p>
-            <p><strong>Modèle:</strong> ${boutique.modele}</p>
-            <p><strong>Prix:</strong> ${boutique.prix} €</p>
-            <p><strong>Quantité:</strong> ${boutique.quantite}</p>
+            <p><strong>Modèle:</strong> ${boutique.modele}</p>        
+            <p><strong>Distance:</strong> ${distanceText}</p>
           </div>
         `;
 
@@ -154,7 +185,7 @@ const BoutiqueMapProximite = () => {
           position: boutiquePosition,
           map: mapInstance,
           label: `${index + 1}`,
-          title: boutique.boutique
+          title: `${boutique.boutique} - ${distanceText}`,
         });
 
         const infoWindow = new window.google.maps.InfoWindow({

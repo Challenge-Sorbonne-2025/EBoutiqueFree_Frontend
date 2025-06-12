@@ -117,7 +117,7 @@ const UserAdministrationPage: React.FC = () => {
                           <i className="bi bi-star-fill"></i>
                           </span>
                       </h3>
-                      <p className="fs-7">Hello, J'ai effectué une demande de réapprovisionnement ...</p>
+                      <p className="fs-7">Hello, demande de réapprovisionnement ...</p>
                       <p className="fs-7 text-secondary">
                         <i className="bi bi-clock-fill me-1"></i> 4 Hours Ago
                       </p>
