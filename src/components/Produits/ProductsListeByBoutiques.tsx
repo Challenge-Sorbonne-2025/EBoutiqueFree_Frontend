@@ -7,13 +7,15 @@ import {
   Grid,
   Pagination,
   Typography,
-  Alert
+  Alert,
+  IconButton
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
   getProduitsByBoutique,
   deleteProduit
 } from '../../services/produits/produitService';
-
+import { canEditOrDelete } from '../../services/auth';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { ProduitResponse } from './Produits';
 
@@ -25,6 +27,7 @@ const ProductsListeByBoutiques: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const itemsPerPage = 6;
 
   const navigate = useNavigate();
@@ -64,6 +67,14 @@ const ProductsListeByBoutiques: React.FC = () => {
 
     fetchProduits();
   }, [boutiqueId, page]);
+
+  useEffect(() => {
+    const checkPermissions = async () => {
+      const authorized = await canEditOrDelete();
+      setIsAuthorized(authorized);
+    };
+    checkPermissions();
+  }, []);
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('Confirmer la suppression ?')) return;
@@ -109,12 +120,17 @@ const ProductsListeByBoutiques: React.FC = () => {
   return (
     <Container>
       <Box display="flex" justifyContent="space-between" alignItems="center" my={4}>
+        {boutiqueId && (
+      <IconButton onClick={() => navigate('/boutiques')} sx={{ mr: 2 }}>
+        <ArrowBackIcon />
+      </IconButton>
+    )}
         <Typography variant="h4">
           {boutiqueId ? `Liste des produits de la boutique #${boutiqueId}` : 'Liste des Produits'}
-        </Typography>
+        </Typography> { isAuthorized && (
         <Button variant="contained" color="primary" onClick={handleAjouterProduit}>
           Ajouter
-        </Button>
+        </Button>)}
       </Box>
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -140,7 +156,7 @@ const ProductsListeByBoutiques: React.FC = () => {
                       {produit.nom_produit}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Prix: {produit.prix} FCFA
+                      Prix: {produit.prix} €
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Couleur: {produit.couleur}
@@ -153,7 +169,7 @@ const ProductsListeByBoutiques: React.FC = () => {
                     </Typography>
                     
                     {/* Affichage des informations de la boutique */}
-                    {produit.boutiques && produit.boutiques.length > 0 && (
+                    {isAuthorized && produit.boutiques && produit.boutiques.length > 0 && (
                       <Typography variant="body2" color="text.secondary">
                         Quantité: {produit.boutiques[0].quantite}
                       </Typography>
@@ -190,21 +206,29 @@ const ProductsListeByBoutiques: React.FC = () => {
                     )}
                     
                     <Box display="flex" justifyContent="space-between" mt={2}>
-                      <Button
+                      {isAuthorized && (<Button
                         size="small"
                         variant="outlined"
-                        onClick={() => navigate(`/products/edit/${produit.produit_id}`)}
+                        onClick={() => navigate(`/boutiques/${boutiqueId}/produits/edit/${produit.produit_id}`)}
                       >
                         Modifier
-                      </Button>
-                      <Button
+                      </Button> )}
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => navigate(`/products/${produit.produit_id}`)}
+                    >
+                      Voir plus
+                    </Button>
+
+                     {isAuthorized && ( <Button
                         size="small"
                         variant="outlined"
                         color="error"
                         onClick={() => handleDelete(produit.produit_id)}
                       >
                         Supprimer
-                      </Button>
+                      </Button>)}
                     </Box>
                   </Box>
                 </Grid>

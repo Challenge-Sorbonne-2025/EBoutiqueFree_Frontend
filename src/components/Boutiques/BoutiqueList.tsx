@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 
 
-
+import { canEditOrDelete } from '../../services/auth';
 import { getAllBoutiques } from '../../services/boutiques/boutiqueService';
 // import BoutiqueDeleteButton from './BoutiqueDeleteButton';
 import type { Boutique } from './Boutique';
@@ -24,6 +24,7 @@ const BoutiqueList: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const[isAuthorized, setIsAuthorized] = useState(false);
 
   const navigate = useNavigate();
 
@@ -51,17 +52,27 @@ const BoutiqueList: React.FC = () => {
     setPage(value);
   };
 
+  useEffect(() => {
+    const checkPermissions = async () => {
+      const authorized = await canEditOrDelete();
+      setIsAuthorized(authorized);
+    };
+
+    checkPermissions();
+  }, []);
+
+
   return (
     <Container>
       <Box display="flex" justifyContent="space-between" alignItems="center" my={4}>
         <Typography variant="h4">Liste des Boutiques</Typography>
-        <Button
+        {isAuthorized && (<Button
           variant="contained"
           color="primary"
           onClick={() => navigate('/boutiques/nouveau')}
         >
           Ajouter
-        </Button>
+        </Button>)}
       </Box>
 
       {error && <Alert severity="error">{error}</Alert>}
@@ -78,17 +89,18 @@ const BoutiqueList: React.FC = () => {
                 <Typography variant="h6">{boutique.nom_boutique}</Typography>
                 <Typography>{boutique.adresse}</Typography>
                 <Typography>{boutique.ville} - {boutique.code_postal}</Typography>
+                <Typography>{boutique.departement}</Typography>
                 <Typography>{boutique.num_telephone}</Typography>
                 <Typography>{boutique.email}</Typography>
 
                 <Box mt={2} display="flex" justifyContent="space-between">
-                  <Button
+                  {isAuthorized &&(<Button
                     size="small"
                     variant="outlined"
                     onClick={() => navigate(`/boutiques/edit/${boutique.boutique_id}`)} // ✅ corrigé ici
                   >
                     Modifier
-                  </Button>
+                  </Button>)}
 
                   <Button
                     size="small"

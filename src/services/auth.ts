@@ -1,4 +1,5 @@
 import api from './api';
+import { getUserById } from './users/UserService';
 // import publicApi from './publicApi';
 
 interface LoginResponse {
@@ -133,5 +134,29 @@ export const getCurrentUserDetails = async (): Promise<{
     user : UserDetails | null;
 }> => {
     const userDetails = await getUserDetails();
+    if (!userDetails) {
+        return { user: null };
+    }
+    console.log('Détails de l\'utilisateur récupérés avec succès:', userDetails);
+    // Vous pouvez ajouter d'autres informations ou transformations ici si nécessaire
+    console.log('Détails de l\'utilisateur:', userDetails);
+    // Retourner les détails de l'utilisateur
     return { user: userDetails };
 };
+
+export const canEditOrDelete = async (): Promise<boolean> => {
+    const userDetails = await getCurrentUserDetails();
+    if (!userDetails || !userDetails.user) {
+        console.log('Aucun utilisateur connecté ou détails utilisateur non disponibles');
+        return false;
+    }
+
+    const profile = await getUserById(userDetails.user?.profile);
+    if (!profile) {
+        console.log('Profil utilisateur non trouvé');
+        return false;
+    }
+    const role = profile.role;
+    console.log('Rôle de l\'utilisateur:', role);
+    return role === 'GESTIONNAIRE' || role === 'RESPONSABLE';   
+}

@@ -8,8 +8,8 @@ import {
   updateProduit
 } from '../../services/produits/produitService';
 import type { ProduitCreate } from './Produits';
-import { getAllBoutiques } from '../../services/boutiques/boutiqueService';
-import { getAllModeles } from '../../services/produits/ModeleService';
+import { geAllBoutiquesWithoutPagination } from '../../services/boutiques/boutiqueService';
+import { geAllModelesWithoutPagination } from '../../services/produits/ModeleService';
 
 const ProductForm: React.FC = () => {
   const { produit_id } = useParams();
@@ -23,7 +23,7 @@ const ProductForm: React.FC = () => {
     prix: '',
     couleur: '',
     capacite: '',
-    image: '',  
+    // image: '',  
     ram: '',
     modele: '',
   });
@@ -40,7 +40,7 @@ const ProductForm: React.FC = () => {
   useEffect(() => {
     const fetchBoutiques = async () => {
       try {
-        const data = await getAllBoutiques();
+        const data = await geAllBoutiquesWithoutPagination();
         if (Array.isArray(data)) {
           setBoutiques(data);
         } 
@@ -61,7 +61,7 @@ const ProductForm: React.FC = () => {
   useEffect(() => {
     const fetchModeles = async () => {
       try {
-        const data = await getAllModeles();
+        const data = await geAllModelesWithoutPagination();
         if (Array.isArray(data)) {
           setModeles(data);
         }
@@ -108,7 +108,7 @@ const ProductForm: React.FC = () => {
           prix: data.prix || '',
           couleur: data.couleur || '',
           capacite: data.capacite || '',
-          image: data.image || '',
+          // image: data.image || '',
           ram: data.ram || '',
           modele: data.modele?.modele_id?.toString() || '',
         };
@@ -167,10 +167,12 @@ const ProductForm: React.FC = () => {
         await createProduit(payload);
       }
 
-      const redirectPath = isCreationInBoutique && produit_id
-        ? `/boutiques/${produit_id}/produits`
-        : '/products';
-      navigate(redirectPath);
+      // const redirectPath = isCreationInBoutique && produit_id
+      //   ? `/boutiques/${produit_id}/produits`
+      //   : '/products';
+      
+      navigate(-1);
+     
     } catch (error: any) {
       console.error('Erreur lors de la soumission :', error);
       setError(error.message || 'Erreur lors de la soumission du formulaire');
@@ -277,14 +279,14 @@ const ProductForm: React.FC = () => {
             type="number"
           />
           
-          <TextField 
+          {/* <TextField 
             fullWidth 
             label="Image URL" 
             name="image" 
             value={formData.image} 
             onChange={handleChange} 
             margin="normal"  
-          />
+          /> */}
           
           <TextField 
             fullWidth 
@@ -313,10 +315,13 @@ const ProductForm: React.FC = () => {
             </Select>
           </FormControl>
           
-          <Box mt={2}>
-            <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
-              {loading ? <CircularProgress size={24} /> : isEditMode ? 'Mettre à jour' : 'Créer'}
-            </Button>
+          <Box  mt={3} display="flex" justifyContent="space-between">
+             <Button variant="outlined" onClick={() => navigate(-1)} style={{ marginRight: 8 }}>
+                            Annuler
+              </Button>
+              <Button type="submit" variant="contained" color="primary">
+                             {loading ? <CircularProgress size={24} /> : isEditMode ? 'Mettre à jour' : 'Ajouter'}
+                            </Button>
           </Box>
         </form>
       </Box>

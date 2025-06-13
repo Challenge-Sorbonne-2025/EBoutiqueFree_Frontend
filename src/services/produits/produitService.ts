@@ -61,6 +61,19 @@ export const deleteProduit = async (id: number | string) => {
   return response.data;
 };
 
+export const searchProduits = async (
+  query: string): Promise<ProduitResponse[]> => {
+  const response = await publicApi.get('/produits/search_product/', {
+    params: { query: query }
+  });
+  if (!Array.isArray(response.data)) {
+    console.error('Réponse inattendue:', response.data);
+    throw new Error('Format de données inattendu');
+  }
+  console.log('Réponse de recherche de produits:', response.data);
+  return response.data;
+};
+
 export const paginateArray = <T>(array: T[], page: number, limit: number) => {
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
@@ -72,3 +85,4 @@ export const paginateArray = <T>(array: T[], page: number, limit: number) => {
     hasMore: endIndex < array.length
   };
 };
+

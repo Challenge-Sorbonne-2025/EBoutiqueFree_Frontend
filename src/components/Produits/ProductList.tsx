@@ -19,6 +19,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { getAllProduits, deleteProduit } from '../../services/produits/produitService';
 import type { ProduitResponse } from './Produits';
+import { canEditOrDelete } from '../../services/auth';
+
 
 const ProductList: React.FC = () => {
   const [produits, setProduits] = useState<ProduitResponse[]>([]);
@@ -31,6 +33,9 @@ const ProductList: React.FC = () => {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
 
   const navigate = useNavigate();
+
+  // Vérification des permissions
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   const fetchProduits = async () => {
     try {
@@ -54,6 +59,16 @@ const ProductList: React.FC = () => {
   useEffect(() => {
     fetchProduits();
   }, [page]);
+
+  useEffect(() => {
+    // Vérification des permissions pour l'édition et la suppression
+    const checkPermissions = async () => {
+      const authorized = await canEditOrDelete();
+      setIsAuthorized(authorized);
+    };
+    checkPermissions();
+  }, []);
+
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
@@ -86,9 +101,10 @@ const ProductList: React.FC = () => {
     <Container sx={{ mt: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Liste des Produits</Typography>
+        { isAuthorized && (
         <Button variant="contained" color="primary" onClick={() => navigate('/products/new')}>
           Ajouter
-        </Button>
+        </Button>)}
       </Box>
 
       {error && <Alert severity="error">{error}</Alert>}
@@ -118,13 +134,13 @@ const ProductList: React.FC = () => {
                     />
                   )}
                   <Box mt={2} display="flex" gap={1}>
-                    <Button
+                    {isAuthorized && (<Button
                       size="small"
                       variant="outlined"
                       onClick={() => navigate(`/products/edit/${product.produit_id}`)}
                     >
                       Modifier
-                    </Button>
+                    </Button>)}
                     <Button
                       size="small"
                       variant="outlined"
@@ -132,14 +148,14 @@ const ProductList: React.FC = () => {
                     >
                       Voir plus
                     </Button>
-                    <Button
+                   {isAuthorized &&( <Button
                       size="small"
                       variant="outlined"
                       color="error"
                       onClick={() => handleDeleteClick(product.produit_id)}
                     >
                       Supprimer
-                    </Button>
+                    </Button>)}
                   </Box>
                 </CardContent>
               </Card>

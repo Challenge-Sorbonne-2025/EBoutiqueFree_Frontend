@@ -1,14 +1,15 @@
 import _, { useState } from 'react';
-import { searchProduitByNom } from '../../services/userInterface/searchProductService';
+ 
 import useUserLocation from './hooks/useUserLocation';
 import calculateDistance from './utils/calculateDistance';
 import ProductDetails from './ProductDetails';
 import BoutiqueMap from './BoutiqueMap';
 import 'leaflet/dist/leaflet.css';
 import Header_accueil from '../Headers/Header_accueil';
+import { searchProduits } from '../../services/produits/produitService';
 
 const RechercheProduit = () => {
-  const [nomRecherche, setNomRecherche] = useState('');
+  const [query, setQuery] = useState('');
   const [produit, setProduit] = useState<any | null>(null);
   const [boutiques, setBoutiques] = useState<any[]>([]);
   const [error, setError] = useState('');
@@ -17,19 +18,27 @@ const RechercheProduit = () => {
 
   const handleSearch = async () => {
     try {
-      const data = await searchProduitByNom(nomRecherche);
-      setProduit(data.produit);
+      const data = await searchProduits(query);
+      setProduit(data);
+
+      // Flatten all boutiques from all products
+      const allBoutiques = data.flatMap((produit: any) =>
+        produit.boutiques.map((b: any) => ({
+          ...b,
+          produit, // Optionally keep reference to the product
+        }))
+      );
 
       if (userLocation) {
         const [userLat, userLng] = userLocation;
-        const boutiquesAvecDistance = data.boutiques.map((b: any) => ({
+        const boutiquesAvecDistance = allBoutiques.map((b: any) => ({
           ...b,
           distance: calculateDistance(userLat, userLng, b.latitude, b.longitude),
         }));
         const sorted = boutiquesAvecDistance.sort((a, b) => a.distance - b.distance);
         setBoutiques(sorted);
       } else {
-        setBoutiques(data.boutiques);
+        setBoutiques(allBoutiques);
       }
 
       setError('');
@@ -44,12 +53,13 @@ const RechercheProduit = () => {
     <div className="recherche-container">
       {<Header_accueil />}
       <div className="search-box" style={{ padding: '1rem' }}>
-        <h2>🔍 Rechercher un produit</h2>
+        <h2>🔍 Rechercher votre smartphone</h2>
         <input
           type="text"
-          value={nomRecherche}
-          onChange={(e) => setNomRecherche(e.target.value)}
-          placeholder="Nom du produit"
+          name='query'
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="nom, modele ou marque de votre smartphone"
           style={{ padding: '0.5rem', width: '100%', maxWidth: 400 }}
         />
         <button onClick={handleSearch} style={{ marginTop: '0.5rem' }}>

@@ -4,6 +4,8 @@ import ProductForm from '../components/Produits/ProductForm';
 import ProductList from '../components/Produits/ProductList';
 import DetailProduit from '../components/Produits/DetailProduit';
 import ProductsListeByBoutiques from '../components/Produits/ProductsListeByBoutiques';
+import RechercheProduit from '../components/userInterface/RechercheProduit';
+
 
 
 const produitRoutes = [
@@ -32,10 +34,15 @@ const produitRoutes = [
     path: '/boutiques/:id/produits/nouveau',
     element: <ProductForm />
   },
-  // {
-  //   path: '/modeles/recherche', // ✅ Route de recherche
-  //   element: <RechercheProduit />
-  // }
+
+  {
+    path: '/boutiques/:id/produits/edit/:produit_id',
+    element: <ProductForm />
+  },
+  {
+    path: '/search-produit', 
+    element: <RechercheProduit />
+  }
 ];
 
 export default produitRoutes;

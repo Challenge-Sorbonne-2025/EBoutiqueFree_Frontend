@@ -29,7 +29,7 @@ export interface ProduitCreate {
     prix: number;
     couleur: string;
     capacite: number;
-    image: string;
+    // image: string;
     ram: number;
     modele: number;   
 }

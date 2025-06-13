@@ -33,3 +33,25 @@ export const deleteBoutique = async (boutique_id: number | string) => {
   const response = await api.delete(`/boutiques/${boutique_id}/`);
   return response.data;
 };
+
+export const geAllBoutiquesWithoutPagination = async () => {
+  let allModels: any[] = [];
+  let page = 1;
+  let hasNextPage = true;
+  while (hasNextPage) {
+    const response = await publicApi.get('/boutiques/', {
+      params:{
+        page:page,
+      }});
+      allModels = [...allModels, ...response.data.results];
+      if (response.data.next) {
+        page++;
+      }
+      else {
+        hasNextPage = false;
+      }
+   
+  }
+  return allModels;
+};
+

@@ -1,0 +1,115 @@
+import /*React*/_, { useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import { searchProduitByNom } from '../../services/userInterface/searchProductService';
+import useUserLocation from './hooks/useUserLocation';
+import calculateDistance from './utils/calculateDistance';
+import 'leaflet/dist/leaflet.css';
+
+const RechercheProduit = () => {
+  const [nomRecherche, setNomRecherche] = useState('');
+  const [produit, setProduit] = useState<any | null>(null);
+  const [boutiques, setBoutiques] = useState<any[]>([]);
+  const [error, setError] = useState('');
+
+  const { location: userLocation, error: locationError } = useUserLocation();
+
+  const handleSearch = async () => {
+    try {
+      const data = await searchProduitByNom(nomRecherche);
+      setProduit(data.produit);
+
+      if (userLocation) {
+        const [userLat, userLng] = userLocation;
+
+        // Trie les boutiques selon la distance calculée
+        const boutiquesAvecDistance = data.boutiques.map((b: any) => ({
+          ...b,
+          distance: calculateDistance(userLat, userLng, b.latitude, b.longitude),
+        }));
+        const sorted = boutiquesAvecDistance.sort((a, b) => a.distance - b.distance);
+        setBoutiques(sorted);
+      } else {
+        setBoutiques(data.boutiques);
+      }
+
+      setError('');
+    } catch (err) {
+      setProduit(null);
+      setBoutiques([]);
+      setError('Produit non trouvé.');
+    }
+  };
+
+  return (
+    <div style={{ padding: '1rem' }}>
+      <h2>🔍 Rechercher un produit</h2>
+      <input
+        type="text"
+        value={nomRecherche}
+        onChange={(e) => setNomRecherche(e.target.value)}
+        placeholder="Nom du produit"
+        style={{ padding: '0.5rem', width: '100%', maxWidth: 400 }}
+      />
+      <button onClick={handleSearch} style={{ marginTop: '0.5rem' }}>
+        Rechercher
+      </button>
+
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {locationError && <p style={{ color: 'orange' }}>{locationError}</p>}
+
+      {produit && (
+        <div style={{ marginTop: '2rem' }}>
+          <h3>{produit.nom_produit}</h3>
+          <p>💶 {produit.prix} €</p>
+
+          <h4>🛍️ Boutiques avec stock :</h4>
+          <ul>
+            {boutiques.map((b, i) => (
+              <li key={i}>
+                {b.nom} – {b.quantite} en stock
+                {b.distance && <> ({b.distance.toFixed(2)} km)</>}
+              </li>
+            ))}
+          </ul>
+
+          {userLocation && (
+            <MapContainer
+              center={userLocation}
+              zoom={10}
+              style={{ height: '400px', width: '100%', marginTop: '1rem' }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+
+              {/* Position de l’utilisateur */}
+              <Marker position={userLocation}>
+                <Popup>📍 Vous êtes ici</Popup>
+              </Marker>
+
+              {/* Boutiques */}
+              {boutiques.map((b, i) => (
+                <Marker key={i} position={[b.latitude, b.longitude]}>
+                  <Popup>
+                    <strong>{b.nom}</strong>
+                    <br />
+                    📦 Stock : {b.quantite}
+                    <br />
+                    📏 {b.distance?.toFixed(2)} km
+                  </Popup>
+                  <Polyline
+                    positions={[userLocation, [b.latitude, b.longitude]]}
+                    color="blue"
+                  />
+                </Marker>
+              ))}
+            </MapContainer>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default RechercheProduit;

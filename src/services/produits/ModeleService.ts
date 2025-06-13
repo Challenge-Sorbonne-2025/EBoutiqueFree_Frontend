@@ -29,6 +29,26 @@ export const deleteModele = async (modele_id: number) => {
 };
 
 
+export const geAllModelesWithoutPagination = async () => {
+  let allModels: any[] = [];
+  let page = 1;
+  let hasNextPage = true;
+  while (hasNextPage) {
+    const response = await publicApi.get('/modeles/', {
+      params:{
+        page:page,
+      }});
+      allModels = [...allModels, ...response.data.results];
+      if (response.data.next) {
+        page++;
+      }
+      else {
+        hasNextPage = false;
+      }
+   
+  }
+  return allModels;
+};
 
 
 

@@ -19,7 +19,7 @@ export default function StoreFinder() {
                                 </Link>
                             </div>
                             <div className="field">
-                                <Link to="/modeles" className="search-input">
+                                <Link to="/search-produit" className="search-input">
                                     Selectionner votre modèle de smartphones
                                 </Link>
                             </div>
