@@ -98,91 +98,112 @@ const ProductList: React.FC = () => {
   };
 
   return (
-    <Container sx={{ mt: 4 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4">Liste des Produits</Typography>
-        { isAuthorized && (
+  <Container sx={{ mt: 4 }}>
+    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Typography variant="h4">Liste des Produits</Typography>
+      {isAuthorized && (
         <Button variant="contained" color="primary" onClick={() => navigate('/products/new')}>
           Ajouter
-        </Button>)}
+        </Button>
+      )}
+    </Box>
+
+    {error && <Alert severity="error">{error}</Alert>}
+
+    {loading ? (
+      <Box display="flex" justifyContent="center" mt={4}>
+        <CircularProgress />
       </Box>
+    ) : (
+      <Grid container spacing={3}>
+        {produits.map((product) => (
+          <Grid item xs={12} sm={6} md={4} key={product.produit_id}>
+            <Card sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
+              {product.image && (
+                <Box
+                  sx={{
+                    width: 130,
+                    height: 130,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    mb: 2,
+                  }}
+                >
+                  <img
+                    src={product.image}
+                    alt={product.nom_produit}
+                    style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
+                  />
+                </Box>
+              )}
+              <CardContent sx={{ textAlign: 'center' }}>
+                <Typography variant="subtitle1" fontWeight="medium">{product.nom_produit}</Typography>
+                <Typography variant="body2">Prix: {product.prix} €</Typography>
+                {/* <Typography variant="body2">Couleur: {product.couleur}</Typography> */}
+                <Typography variant="body2">Stockage: {product.capacite} Go - {product.ram} Go Ram</Typography>
+                {/* <Typography variant="body2">RAM: {product.ram} Go</Typography> */}
+                <Typography variant="body2">{product.modele?.marque?.marque} - {product.modele?.modele}</Typography>
+                {/* <Typography variant="body2">Modèle: {product.modele?.modele}</Typography> */}
 
-      {error && <Alert severity="error">{error}</Alert>}
-
-      {loading ? (
-        <Box display="flex" justifyContent="center" mt={4}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <Grid container spacing={3}>
-          {produits.map((product) => (
-            <Grid item xs={12} sm={6} md={4} key={product.produit_id}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6">{product.nom_produit}</Typography>
-                  <Typography>Prix: {product.prix} €</Typography>
-                  <Typography>Couleur: {product.couleur}</Typography>
-                  <Typography>Capacité: {product.capacite} Go</Typography>
-                  <Typography>RAM: {product.ram} Go</Typography>
-                  <Typography>Marque: {product.modele?.marque?.marque}</Typography>
-                  <Typography>Modèle: {product.modele?.modele}</Typography>
-                  {product.image && (
-                    <img
-                      src={product.image}
-                      alt={product.nom_produit}
-                      style={{ width: '100%', marginTop: 10 }}
-                    />
-                  )}
-                  <Box mt={2} display="flex" gap={1}>
-                    {isAuthorized && (<Button
+                <Box mt={2} display="flex" gap={1} justifyContent="center" flexWrap="wrap">
+                  {isAuthorized && (
+                    <Button
                       size="small"
                       variant="outlined"
                       onClick={() => navigate(`/products/edit/${product.produit_id}`)}
                     >
                       Modifier
-                    </Button>)}
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => navigate(`/products/${product.produit_id}`)}
-                    >
-                      Voir plus
                     </Button>
-                   {isAuthorized &&( <Button
+                  )}
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => navigate(`/products/${product.produit_id}`)}
+                  >
+                    Voir plus
+                  </Button>
+                  {isAuthorized && (
+                    <Button
                       size="small"
                       variant="outlined"
                       color="error"
                       onClick={() => handleDeleteClick(product.produit_id)}
                     >
                       Supprimer
-                    </Button>)}
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
+                    </Button>
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    )}
 
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination count={totalPages} page={page} onChange={handlePageChange} />
-      </Box>
+    <Box display="flex" justifyContent="center" mt={4}>
+      <Pagination count={totalPages} page={page} onChange={handlePageChange} />
+    </Box>
 
-      {/* Dialog de confirmation */}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Confirmation</DialogTitle>
-        <DialogContent>
-          <Typography>Êtes-vous sûr de vouloir supprimer ce produit ?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Annuler</Button>
-          <Button color="error" onClick={handleConfirmDelete}>
-            Supprimer
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
-  );
-};
+    {/* Dialog de confirmation */}
+    <Dialog open={openDialog} onClose={handleCloseDialog}>
+      <DialogTitle>Confirmation</DialogTitle>
+      <DialogContent>
+        <Typography>Êtes-vous sûr de vouloir supprimer ce produit ?</Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseDialog}>Annuler</Button>
+        <Button color="error" onClick={handleConfirmDelete}>
+          Supprimer
+        </Button>
+      </DialogActions>
+    </Dialog>
+  </Container>
+);
+}
+
 
 export default ProductList;

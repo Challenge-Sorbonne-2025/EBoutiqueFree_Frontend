@@ -5,6 +5,8 @@ import ProductList from '../components/Produits/ProductList';
 import DetailProduit from '../components/Produits/DetailProduit';
 import ProductsListeByBoutiques from '../components/Produits/ProductsListeByBoutiques';
 import RechercheProduit from '../components/userInterface/RechercheProduit';
+import ProductsPage from '../components/Produits/ProductsPage';
+import ResultSearchProducts from '../components/Produits/ResultSearchProducts';
 
 
 
@@ -42,7 +44,15 @@ const produitRoutes = [
   {
     path: '/search-produit', 
     element: <RechercheProduit />
-  }
+  },
+   {
+    path: '/smartphones', 
+    element: <ProductsPage />
+  },
+  {
+    path: '/recherche', 
+    element: <ResultSearchProducts />
+  },
 ];
 
 export default produitRoutes;

@@ -29,7 +29,7 @@ export default function StoreFinder() {
                     <section className="store-banner">
                         <div className="store-image-container">
                             <img 
-                                src="/src/assets/images/boutique_paris_republique.jpg" 
+                                src="/images/boutique_paris_republique.jpg" 
                                 alt="Notre boutique"
                                 className="store-banner-image"
                                 onError={(e) => {
@@ -47,7 +47,7 @@ export default function StoreFinder() {
                             <div className="smartphone-card">
                                 <div className="image-container">
                                     <img 
-                                        src="/src/assets/images/SamsungGalaxyF62.jpg" 
+                                        src="/images/SamsungGalaxyF62.jpg" 
                                         alt="Samsung Galaxy S25 Ultra"
                                         className="smartphone-image"
                                         onError={(e) => {
@@ -64,7 +64,7 @@ export default function StoreFinder() {
                             <div className="smartphone-card">
                                 <div className="image-container">
                                     <img 
-                                        src="/src/assets/images/iphone.jpg" 
+                                        src="/images/iphone.jpg" 
                                         alt="iPhone 15 Pro"
                                         className="smartphone-image"
                                         onError={(e) => {
@@ -81,7 +81,7 @@ export default function StoreFinder() {
                             <div className="smartphone-card">
                                 <div className="image-container">
                                     <img 
-                                        src="/src/assets/images/poco.jpg" 
+                                        src="/images/poco.jpg" 
                                         alt="Poco M2 Pro"
                                         className="smartphone-image"
                                         onError={(e) => {

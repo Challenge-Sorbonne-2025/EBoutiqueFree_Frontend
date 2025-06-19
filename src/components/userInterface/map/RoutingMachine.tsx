@@ -4,6 +4,13 @@ import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 
+// TypeScript: Extend Leaflet with Routing for type safety
+declare module 'leaflet' {
+  namespace Routing {
+    function control(options: any): any;
+  }
+}
+
 interface RoutingMachineProps {
   from: [number, number];
   to: [number, number];
