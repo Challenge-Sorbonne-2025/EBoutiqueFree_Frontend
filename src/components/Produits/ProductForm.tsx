@@ -23,7 +23,7 @@ const ProductForm: React.FC = () => {
     prix: '',
     couleur: '',
     capacite: '',
-    // image: '',  
+    image: '',  
     ram: '',
     modele: '',
   });
@@ -279,14 +279,14 @@ const ProductForm: React.FC = () => {
             type="number"
           />
           
-          {/* <TextField 
+          <TextField 
             fullWidth 
             label="Image URL" 
             name="image" 
             value={formData.image} 
             onChange={handleChange} 
             margin="normal"  
-          /> */}
+          />
           
           <TextField 
             fullWidth 

@@ -19,6 +19,10 @@ export interface ProduitResponse {
 export interface BoutiqueResponseProduit {
     boutique_id: number;
     nom_boutique: string;
+    adresse: string;
+    ville: string;
+    code_postal: string;
+    departement: string;
     quantite: number;
 }
 
@@ -29,7 +33,7 @@ export interface ProduitCreate {
     prix: number;
     couleur: string;
     capacite: number;
-    // image: string;
+    image: string;
     ram: number;
     modele: number;   
 }

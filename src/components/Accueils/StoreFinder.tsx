@@ -56,15 +56,15 @@ export default function StoreFinder() {
                                         }}
                                     />
                                 </div>
-                                <h3>Samsung Galaxy S25 Ultra</h3>
+                                <h3>Samsung Galaxy A 51</h3>
                                 <div className="voir-produit">
-                                     <a href="/smartphones/id">Voir le produit</a>
+                                     <a href="/products/141">Voir le produit</a>
                                 </div>
                             </div>
                             <div className="smartphone-card">
                                 <div className="image-container">
                                     <img 
-                                        src="/images/iphone.jpg" 
+                                        src="/images/51R3ROcs1CS.jpg" 
                                         alt="iPhone 15 Pro"
                                         className="smartphone-image"
                                         onError={(e) => {
@@ -73,9 +73,9 @@ export default function StoreFinder() {
                                         }}
                                     />
                                 </div>
-                                <h3>Apple iPhone 15 Pro</h3>
+                                <h3>Realme 6 128 Go</h3>
                                 <div className="voir-produit">
-                                     <a href="/smartphones/id">Voir le produit</a>
+                                     <a href="products/103">Voir le produit</a>
                                 </div>
                             </div>
                             <div className="smartphone-card">
@@ -92,7 +92,7 @@ export default function StoreFinder() {
                                 </div>
                                 <h3>Poco M2 Pro</h3>
                                 <div className="voir-produit">
-                                     <a href="/smartphones/id">Voir le produit</a>
+                                     <a href="/products/20">Voir le produit</a>
                                 </div>
                             </div>
                         </div>

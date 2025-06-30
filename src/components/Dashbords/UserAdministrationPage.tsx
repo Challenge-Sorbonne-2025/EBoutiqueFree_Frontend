@@ -78,7 +78,7 @@ const UserAdministrationPage: React.FC = () => {
                 </a>
               </li>
               <li className="nav-item d-none d-md-block">
-                <a href="/users/" className="nav-link">Home</a>
+                <a href="/" className="nav-link">Home</a>
               </li>
               <li className="nav-item d-none d-md-block">
                 <a href="/users/contact" className="nav-link">Contact</a>

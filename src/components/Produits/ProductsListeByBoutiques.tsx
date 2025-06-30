@@ -18,6 +18,7 @@ import {
 import { canEditOrDelete } from '../../services/auth';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { ProduitResponse } from './Produits';
+import { getBoutiqueById } from '../../services/boutiques/boutiqueService';
 
 const ProductsListeByBoutiques: React.FC = () => {
   const { id: boutiqueId } = useParams<{ id: string }>();
@@ -29,6 +30,7 @@ const ProductsListeByBoutiques: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const itemsPerPage = 6;
+  const [boutique, setBoutique] = useState<any>({});
 
   const navigate = useNavigate();
 
@@ -41,15 +43,18 @@ const ProductsListeByBoutiques: React.FC = () => {
         setError(null);
         
         // L'API retourne directement un tableau, pas un objet avec results/count
-        const data = await getProduitsByBoutique(Number(boutiqueId));
-        
+        const data = await getProduitsByBoutique(Number(boutiqueId));   
         // Vérifier que data est bien un tableau
         if (!Array.isArray(data)) {
           throw new Error('Format de données inattendu');
         }
-        
         setAllProduits(data);
         setTotalPages(Math.ceil(data.length / itemsPerPage));
+
+        const boutiqueData = await getBoutiqueById(Number(boutiqueId));
+        if (boutiqueData) {
+          setBoutique(boutiqueData);
+        }
         
         // Pagination côté frontend
         const startIndex = (page - 1) * itemsPerPage;
@@ -117,6 +122,17 @@ const ProductsListeByBoutiques: React.FC = () => {
     }
   };
 
+  const handleUpdateStockProduit = () => {
+    if (boutiqueId) {
+      navigate(`/boutiques/${boutiqueId}/produits/addStock`);
+    }
+
+    else 
+    {
+      navigate('/produits/nouveau');
+    }
+  };
+
   return (
     <Container>
       <Box display="flex" justifyContent="space-between" alignItems="center" my={4}>
@@ -126,11 +142,17 @@ const ProductsListeByBoutiques: React.FC = () => {
       </IconButton>
     )}
         <Typography variant="h4">
-          {boutiqueId ? `Liste des produits de la boutique #${boutiqueId}` : 'Liste des Produits'}
+          {boutiqueId ? `Liste des produits de la boutique #-${boutique.nom_boutique}` : 'Liste des Produits'}
         </Typography> { isAuthorized && (
-        <Button variant="contained" color="primary" onClick={handleAjouterProduit}>
-          Ajouter
-        </Button>)}
+        <Box display="flex" gap={2}>
+          <Button variant="contained" color="primary" onClick={handleAjouterProduit}>
+            new
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleUpdateStockProduit}>
+            update stock
+          </Button>
+        </Box>
+        )}
       </Box>
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -182,24 +204,27 @@ const ProductsListeByBoutiques: React.FC = () => {
                       </Typography>
                     )}
                     
-                    {/* Statut de validation */}
-                    {/* <Typography 
-                      variant="body2" 
-                      color={produit.validation_responsable ? "success.main" : "warning.main"}
-                    >
-                      {produit.validation_responsable ? "Validé" : "En attente"}
-                    </Typography> */}
-                    
                     {produit.image && (
-                      <Box mt={1}>
+                      <Box sx={{
+                              width: 130,
+                              height: 130,
+                              mx: 'auto',
+                              mb: 2,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              bgcolor: 'grey.100',
+                              borderRadius: 2,
+                              overflow: 'hidden',
+                              cursor: 'pointer',
+                            }}>
                         <img
                           src={produit.image}
                           alt={produit.nom_produit}
                           style={{ 
                             width: '100%', 
-                            height: '150px', 
-                            objectFit: 'cover',
-                            borderRadius: '4px'
+                            height: '100%', 
+                            objectFit: 'contain', 
                           }}
                         />
                       </Box>
@@ -252,5 +277,4 @@ const ProductsListeByBoutiques: React.FC = () => {
     </Container>
   );
 };
-
 export default ProductsListeByBoutiques;

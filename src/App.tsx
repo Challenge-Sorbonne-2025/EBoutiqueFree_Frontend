@@ -8,6 +8,7 @@ import userRoutes from './routes/UserRoutes';
 import Login from './components/Accueils/Login';
 import StoreFinder from './components/Accueils/StoreFinder';
 import './App.css';
+import stockRoutes from './routes/StockRoute';
 
 const theme = createTheme({
   palette: {
@@ -39,6 +40,7 @@ function AppRoutes() {
     ...produitRoutes,
     ...boutiqueRoutes,
     ...userRoutes,
+    ...stockRoutes,
   ]);
   return routes;
 }
